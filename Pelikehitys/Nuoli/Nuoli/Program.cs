@@ -6,6 +6,11 @@
 		{
 			Nuoli nuoli = new Nuoli();
 
+			public Nuoli (Nuoli.ArrowHead nuoli, Nuoli.Fletching sulat, byte pituus)
+			{
+
+			}
+
 			Console.Write("Minkälainen kärki (puu, teräs vai timantti)?: ");
 
 			nuoli.kärki = Enum.Parse<Nuoli.ArrowHead>(Console.ReadLine());

@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Tanks
 {
@@ -7,15 +8,18 @@ namespace Tanks
     {
         static void Main(string[] args)
         {
-            Tank player1 = new Tank();
+			Vector2 windowSize = new Vector2(1080, 720);
+
+			Bullet bulletP1 = null;
+			Bullet bulletP2 = null;
+
+			Tank player1 = new Tank();
             Tank player2 = new Tank();
 
 			player2.tankColor = Color.Red;
-			player2.tankPos.X = 660;
+			player2.tankPos.X = windowSize.X - player2.tankSize.X - 10;
 
-			Bullet currentbullet;
-
-			Raylib.InitWindow(720, 400, "TANKS");
+			Raylib.InitWindow((int)windowSize.X, (int)windowSize.Y, "TANKS");
 
 			while (!Raylib.WindowShouldClose())
             {
@@ -25,16 +29,16 @@ namespace Tanks
             Raylib.CloseWindow();
 
             void UpdateGame()
-            {
+			{
 				//Player 1 movement
-                if (Raylib.IsKeyDown(KeyboardKey.W))
-                {
-                    player1.tankDir = new Vector2(0, -1);
-                    player1.tankPos += player1.tankDir * player1.tankSpeed * Raylib.GetFrameTime();
-                }
-                if (Raylib.IsKeyDown(KeyboardKey.S))
-                {
-                    player1.tankDir = new Vector2(0, 1);
+				if (Raylib.IsKeyDown(KeyboardKey.W))
+				{
+					player1.tankDir = new Vector2(0, -1);
+					player1.tankPos += player1.tankDir * player1.tankSpeed * Raylib.GetFrameTime();
+				}
+				if (Raylib.IsKeyDown(KeyboardKey.S))
+				{
+					player1.tankDir = new Vector2(0, 1);
 					player1.tankPos += player1.tankDir * player1.tankSpeed * Raylib.GetFrameTime();
 				}
 				if (Raylib.IsKeyDown(KeyboardKey.A))
@@ -69,25 +73,56 @@ namespace Tanks
 					player2.tankPos += player2.tankDir * player2.tankSpeed * Raylib.GetFrameTime();
 				}
 
-				if (Raylib.IsKeyPressed(KeyboardKey.E))
+				if (Raylib.IsKeyPressed(KeyboardKey.E) && (Raylib.GetTime() - player1.lastShootTime > 1.5f || bulletP1 == null))
 				{
-					Bullet bullet1 = new Bullet();
-					bullet1.bulletPos = player1.tankPos * 2;
-					bullet1.bulletDir = player1.tankDir;
-					bullet1.FireBullet();
+					bulletP1 = new Bullet();
+					bulletP1.InitBullet(player1.tankPos, player1.tankDir, player1.tankSize);
+					player1.lastShootTime = Raylib.GetTime();
+				}
+				if (Raylib.IsKeyPressed(KeyboardKey.PageUp) && (Raylib.GetTime() - player2.lastShootTime > 1.5f || bulletP1 == null))
+				{
+					bulletP2 = new Bullet();
+					bulletP2.InitBullet(player2.tankPos, player2.tankDir, player2.tankSize);
+					player2.lastShootTime = Raylib.GetTime();
 				}
 
-				if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
+				if (bulletP1 != null)
 				{
-
-					Bullet bullet2 = new Bullet();
+					bulletP1.UpdateBullet();
+					if (Raylib.CheckCollisionPointRec(bulletP1.bulletPos, new Rectangle(player2.tankPos,player2.tankSize)))
+					{
+						Console.WriteLine("Player2 Got hit");
+						bulletP1 = null;
+					}
 				}
+				if (bulletP2 != null)
+				{
+					bulletP2.UpdateBullet();
+					if (Raylib.CheckCollisionPointRec(bulletP2.bulletPos, new Rectangle(player1.tankPos, player1.tankSize)))
+					{
+						Console.WriteLine("Player1 Got hit");
+						bulletP2 = null;
+					}
+				}
+
+
+				player1.BoundsCheck(windowSize);
+				player2.BoundsCheck(windowSize);
 			}
 
-            void DrawGame()
+
+			void DrawGame()
             {
 				Raylib.BeginDrawing();
-				//Raylib.ClearBackground(Color.White);
+				Raylib.ClearBackground(Color.White);
+				if (bulletP1 != null)
+				{
+					bulletP1.DrawBullet();
+				}
+				if (bulletP2 != null)
+				{
+					bulletP2.DrawBullet();
+				}
 				player1.DrawTank();
 				player2.DrawTank();
 				Raylib.EndDrawing();

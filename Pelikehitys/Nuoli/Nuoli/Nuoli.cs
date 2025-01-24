@@ -8,11 +8,11 @@ namespace Nuoli
 {
 	internal class Nuoli
 	{
-		public enum ArrowHead { puu, teräs, timantti}
+		public enum ArrowHead { puu, teräs, timantti }
 		public enum Fletching { lehti, kanansulka, kotkansulka}
-		public ArrowHead kärki;
-		public Fletching sulat;
-		public byte shaftLenghtCm;
+		public ArrowHead kärki { get; private set; }
+		public Fletching sulat { get; private set; }
+		public byte shaftLenghtCm { get; private set; }
 
 		public float PalautaHinta()
 		{
