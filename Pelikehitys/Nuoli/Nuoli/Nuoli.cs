@@ -43,5 +43,18 @@ namespace Nuoli
 			hinta += shaftLenghtCm * 0.05f;
 			return hinta;
 		}
+
+		public static Nuoli LuoEliittiNuoli()
+		{
+			return new Nuoli(ArrowHead.timantti, Fletching.kotkansulka, 100);
+		}
+		public static Nuoli LuoAloittelijaNuoli()
+		{
+			return new Nuoli(ArrowHead.puu, Fletching.kanansulka, 70);
+		}
+		public static Nuoli LuoPerusNuoli()
+		{
+			return new Nuoli(ArrowHead.teräs, Fletching.kanansulka, 85);
+		}
 	}
 }
