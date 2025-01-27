@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,20 @@ namespace Nuoli
 
 			hinta += shaftLenghtCm * 0.05f;
 			return hinta;
+		}
+
+		public void LuoNuoli()
+		{
+			Console.Write("Minkälainen kärki (puu, teräs vai timantti)?: ");
+			kärki = Enum.Parse<Nuoli.ArrowHead>(Console.ReadLine());
+
+			Console.Write("Minkälaiset sulat (lehti, kanansulka vai kotkansulka)?: ");
+			sulat = Enum.Parse<Nuoli.Fletching>(Console.ReadLine());
+
+			Console.Write("Nuolen pituus (60-100cm): ");
+			shaftLenghtCm = byte.Parse(Console.ReadLine());
+			
+			Console.WriteLine($"Tämän nuolen hinta on {PalautaHinta()} kultaa.");
 		}
 	}
 }
