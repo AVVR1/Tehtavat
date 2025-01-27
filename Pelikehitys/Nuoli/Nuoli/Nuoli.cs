@@ -15,6 +15,13 @@ namespace Nuoli
 		public Fletching sulat { get; private set; }
 		public byte shaftLenghtCm { get; private set; }
 
+		public Nuoli(Nuoli.ArrowHead karki, Nuoli.Fletching sulat, byte pituus)
+		{
+			this.kärki = karki;
+			this.sulat = sulat;
+			shaftLenghtCm = pituus;
+		}
+
 		public float PalautaHinta()
 		{
 			float hinta = 0;
@@ -35,20 +42,6 @@ namespace Nuoli
 
 			hinta += shaftLenghtCm * 0.05f;
 			return hinta;
-		}
-
-		public void LuoNuoli()
-		{
-			Console.Write("Minkälainen kärki (puu, teräs vai timantti)?: ");
-			kärki = Enum.Parse<Nuoli.ArrowHead>(Console.ReadLine());
-
-			Console.Write("Minkälaiset sulat (lehti, kanansulka vai kotkansulka)?: ");
-			sulat = Enum.Parse<Nuoli.Fletching>(Console.ReadLine());
-
-			Console.Write("Nuolen pituus (60-100cm): ");
-			shaftLenghtCm = byte.Parse(Console.ReadLine());
-			
-			Console.WriteLine($"Tämän nuolen hinta on {PalautaHinta()} kultaa.");
 		}
 	}
 }

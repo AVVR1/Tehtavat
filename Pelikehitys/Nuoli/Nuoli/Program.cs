@@ -6,13 +6,17 @@ namespace Nuoli
 	{
 		static void Main(string[] args)
 		{
-			Nuoli nuoli = new Nuoli();
+			Console.Write("Minkälainen kärki (puu, teräs vai timantti)?: ");
+			Nuoli.ArrowHead kärki = Enum.Parse<Nuoli.ArrowHead>(Console.ReadLine());
 
-			//public Nuoli (Nuoli.ArrowHead karki, Nuoli.Fletching sulat, byte pituus)
-			//{
+			Console.Write("Minkälaiset sulat (lehti, kanansulka vai kotkansulka)?: ");
+			Nuoli.Fletching sulat = Enum.Parse<Nuoli.Fletching>(Console.ReadLine());
 
-			//}
-			nuoli.LuoNuoli();
+			Console.Write("Nuolen pituus (60-100cm): ");
+			byte ShaftLenghtCm = byte.Parse(Console.ReadLine());
+
+			Nuoli nuoli = new Nuoli(kärki,sulat,ShaftLenghtCm);
+			Console.WriteLine($"Tämän nuolen hinta on {nuoli.PalautaHinta()} kultaa.");
 		}
 	}
 }
