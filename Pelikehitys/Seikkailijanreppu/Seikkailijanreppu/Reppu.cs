@@ -13,7 +13,7 @@ namespace Seikkailijanreppu
 		float tila = 20;
 		float kesto = 30;
 
-		public Tavara[] sisältö { get; private set; } = new Tavara[6];
+		public Tavara[] sisältö { get; private set; } = new Tavara[10];
 		public int määrä = 0;
 
 		public Reppu(int rajoitus, float tila, float kesto)
@@ -58,6 +58,19 @@ namespace Seikkailijanreppu
 				}
 			}
 			return paino;
+		}
+		
+		public override string ToString()
+		{
+			string[] strings = new string[10];
+			for (int i = 0; i < sisältö.Length; i++)
+			{
+				if (sisältö[i] != null)
+				{
+					strings[i] = sisältö[i].ToString();
+				}
+			}
+			return $"Reppussa on seuraavat tavarat: {string.Join(" ", strings)}";
 		}
 	}
 }

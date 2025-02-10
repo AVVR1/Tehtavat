@@ -15,7 +15,7 @@ namespace Seikkailijanreppu
 
 			while (true)
 			{
-                Console.WriteLine($"Repussa on tällä hetkellä {reppu.määrä}/{rajoitus} tavaraa, {reppu.LaskePaino()}/{kesto} painoa ja {reppu.laskeTila()}/{tila} tilaa");
+				Console.WriteLine($"Repussa on tällä hetkellä {reppu.määrä}/{rajoitus} tavaraa, {reppu.LaskePaino()}/{kesto} painoa ja {reppu.laskeTila()}/{tila} tilaa");
                 Console.WriteLine("Mitä haluat lisätä?");
 				for (int i = 0; i < tavarat.Count; i++)
 				{
@@ -34,7 +34,15 @@ namespace Seikkailijanreppu
 
 				if (reppu.Lisää(valittuTavara))
 				{
-					
+					Console.Clear();
+					Console.WriteLine(reppu);
+				}
+				else
+				{
+					Console.Clear();
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Tavaraa ei voi laittaa reppuun");
+					Console.ResetColor();
 				}
 			}
 		}

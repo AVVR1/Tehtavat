@@ -12,5 +12,10 @@ namespace Seikkailijanreppu
 		{
 
 		}
+
+		public override string ToString()
+		{
+			return "jousi";
+		}
 	}
 }
