@@ -14,7 +14,7 @@ namespace Tanks
 		public Vector2 tankPos = new Vector2(10, 335);
 		public Vector2 tankDir = new Vector2(0, -1);
 		public Color tankColor = Color.DarkBlue;
-		public float tankSpeed = 100;
+		public float tankSpeed = 200;
 		public double lastShootTime;
 		public void DrawTank()
 		{

@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
 
@@ -19,14 +20,17 @@ namespace Tanks
 			List<Rectangle> walls = new List<Rectangle>();
 			walls.Add(new Rectangle(windowSize.X / 2 - 100, 0, new Vector2(200, 100)));
 			walls.Add(new Rectangle(windowSize.X / 2 - 100, windowSize.Y / 2 - 100, new Vector2(200, 200)));
-			walls.Add(new Rectangle(windowSize.X / 2 - 100, windowSize.Y - 100, new Vector2(200, 100)));
+			walls.Add(new Rectangle(windowSize.X / 2 - 100	, windowSize.Y - 100, new Vector2(200, 100)));
 
 			player2.tankColor = Color.Red;
-			player2.tankPos.X = windowSize.X - player2.tankSize.X - 10;
+			player2.tankPos.X = windowSize.X - player2.tankSize.X - 10 -300;
+
+			///
+			float lenght = 0;
+			///
 
 			Raylib.InitWindow((int)windowSize.X, (int)windowSize.Y, "TANKS");
 
-			Vector2 vectorToPlayer = new Vector2(0, 0);
 			Rectangle collisionRec = new Rectangle(0,0,0,0);
 
 			while (!Raylib.WindowShouldClose())
@@ -38,9 +42,6 @@ namespace Tanks
 
 			void UpdateGame()
 			{
-				//
-				vectorToPlayer = ((walls[1].Position + walls[1].Size / 2) - (player2.tankPos + player2.tankSize / 2));
-				//
 
 				//Player 1 movement
 				if (Raylib.IsKeyDown(KeyboardKey.W))
@@ -120,22 +121,52 @@ namespace Tanks
 				player1.BoundsCheck(windowSize);
 				player2.BoundsCheck(windowSize);
 
-				foreach (var item in walls)
+				foreach (var wall in walls)
 				{
-					if (Raylib.CheckCollisionRecs(item, new Rectangle(player1.tankPos, player1.tankSize)))
+					if (Raylib.CheckCollisionRecs(wall, new Rectangle(player1.tankPos, player1.tankSize)))
 					{
 						player1.tankPos -= player1.tankDir * player1.tankSpeed * Raylib.GetFrameTime();
 					}
-					if (Raylib.CheckCollisionRecs(item, new Rectangle(player2.tankPos, player2.tankSize)))
+					if (Raylib.CheckCollisionRecs(wall, new Rectangle(player2.tankPos, player2.tankSize)))
 					{
-						collisionRec = Raylib.GetCollisionRec(new Rectangle(player2.tankPos, player2.tankSize), item);
+						Vector2 vectorToWall = (wall.Position + wall.Size / 2) - (player2.tankPos + player2.tankSize / 2);
+						Vector2 normalizedVector = Vector2.Normalize(vectorToWall);
+						if (collisionRec.Width < collisionRec.Height)
+						{
+							// Resolve along the x-axis
+							if (player2.tankPos.X < wall.Position.X)
+							{
+								// Player is to the left of the wall
+								player2.tankPos.X -= collisionRec.Width;
+							}
+							else
+							{
+								// Player is to the right of the wall
+								player2.tankPos.X += collisionRec.Width;
+							}
+						}
+						else
+						{
+							// Resolve along the y-axis
+							if (player2.tankPos.Y < wall.Position.Y)
+							{
+								// Player is above the wall
+								player2.tankPos.Y -= collisionRec.Height;
+							}
+							else
+							{
+								// Player is below the wall
+								player2.tankPos.Y += collisionRec.Height;
+							}
+						}
 
-						//player2.tankPos -= collisionRec.Size * player2.tankDir;
-						player2.tankPos = ((item.Position + item.Size/2) - vectorToPlayer + player2.tankSize/2);
-
-                        Console.WriteLine(vectorToPlayer);
+						collisionRec = Raylib.GetCollisionRec(new Rectangle(player2.tankPos, player2.tankSize), wall);
+						lenght = (collisionRec.Width * MathF.Abs(normalizedVector.X) + collisionRec.Height * MathF.Abs(normalizedVector.Y))/2;
+						//player2.tankPos -= normalizedVector * lenght;
+						//player2.tankPos = wall.Position + wall.Size / 2 - normalizedVector * lenght;
+                        //Console.WriteLine(lenght);
 					}
-				}
+				}	
 			}
 			void DrawGame()
 				{
@@ -154,8 +185,8 @@ namespace Tanks
 					foreach (var item in walls)
 					{
 						Raylib.DrawRectangleRec(item, Color.DarkGray);
-						Raylib.DrawCircleV(vectorToPlayer + windowSize/2, 10, Color.Brown);
-						Raylib.DrawLineV(item.Position + item.Size/2,player2.tankPos + player2.tankSize/2, Color.Red);
+						//sRaylib.DrawLineV(item.Position + item.Size/2,player2.tankPos + player2.tankSize/2, Color.Red);
+					Raylib.DrawLineV(item.Position + item.Size / 2, item.Position + item.Size /2 + Vector2.Normalize((item.Position + item.Size / 2) - (player2.tankPos + player2.tankSize / 2)) * lenght *-1, Color.Red);
 					}
 					Raylib.DrawRectangleV(collisionRec.Position,collisionRec.Size,Color.Pink);
 					Raylib.EndDrawing();
