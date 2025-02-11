@@ -16,12 +16,12 @@ namespace Tanks
 		public Color tankColor = Color.DarkBlue;
 		public float tankSpeed = 200;
 		public double lastShootTime;
+		public int points = 0;
 		public void DrawTank()
 		{
 			Raylib.DrawRectangleV(tankPos, tankSize, tankColor);
 			Raylib.DrawRectangleV(new Vector2(tankPos.X + tankSize.X / 2 - tankDir.Y * 5 - tankDir.X * 5, tankPos.Y + tankSize.Y / 2 - tankDir.X * 5 - tankDir.Y * 5), new Vector2(tankDir.Y * 10 + tankDir.X * 40, tankDir.X * 10 + tankDir.Y * 40), tankColor);
 		}
-
 		public void BoundsCheck(Vector2 windowSize)
 		{
 			if (tankPos.X < 0)
@@ -40,6 +40,12 @@ namespace Tanks
 			{
 				tankPos.Y = windowSize.Y - tankSize.Y;
 			}
+		}
+
+		public void TriggerDeath()
+		{
+			Vector3 tankHSV = Raylib.ColorToHSV(tankColor);
+			tankColor = Raylib.ColorFromHSV(tankHSV.X - 30, tankHSV.Y, tankHSV.Z);
 		}
 	}
 }
