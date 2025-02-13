@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Robotti
 {
-	internal class Käynnistä : Robottikäsky
+	internal class Käynnistä : RobottiKäsky
 	{
-		public override void Suorita()
+		public override void Suorita(Robotti robotti)
 		{
-
+			robotti.OnKäynnissä = true;
 		}
 	}
 }
