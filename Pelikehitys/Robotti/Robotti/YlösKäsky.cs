@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Robotti
 {
-	internal class YlösKäsky : RobottiKäsky
+	internal class YlösKäsky : IRobottiKäsky
 	{
-		public override void Suorita(Robotti robotti)
+		public void Suorita(Robotti robotti)
 		{
 			if (robotti.OnKäynnissä)
 			{

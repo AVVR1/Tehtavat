@@ -11,11 +11,11 @@ namespace Robotti
 		public int X { get; set; }
 		public int Y { get; set; }
 		public bool OnKäynnissä { get; set; }
-		public RobottiKäsky?[] Käskyt { get; } = new RobottiKäsky?[3];
+		public IRobottiKäsky?[] Käskyt { get; } = new IRobottiKäsky?[3];
 
 		public void Suorita()
 		{
-			foreach (RobottiKäsky? käsky in Käskyt)
+			foreach (IRobottiKäsky? käsky in Käskyt)
 			{
 				käsky?.Suorita(this);
 				Console.WriteLine($"[{X} {Y} {OnKäynnissä}]");

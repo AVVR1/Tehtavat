@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Robotti
 {
-	public abstract class RobottiKäsky
+	public interface IRobottiKäsky
 	{
-		public abstract void Suorita(Robotti robotti);
+		void Suorita(Robotti robotti);
 	}
 }
