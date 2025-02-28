@@ -10,37 +10,54 @@ namespace Lunar_Lander
 {
 	internal class Rocket
 	{
-		public Vector2 pos = new Vector2(475,0);
+
+		public Vector2 velocity = Vector2.Zero;
+		float acceleration;
+		float enginePower = 200;
+		public float fuel = 500;
 		public bool engineOn = false;
-		Vector2 velocity = Vector2.Zero;
-		float acceleration = 0;
-		float speed = 0;
 
-		float enginePower = 5000;
+		public Vector2 pos = new Vector2(480,0);
 
-		Vector2 direction = new Vector2(0,1);
-
-		Vector2 A = new Vector2(15, 0);
-		Vector2 B = new Vector2(0, 40);
-		Vector2 C = new Vector2(30, 40);
+		Vector2 A = new Vector2(0, 0);
+		Vector2 B = new Vector2(-15, 40);
+		Vector2 C = new Vector2(15, 40);
 		public void Update()
 		{
+			//kiihtyvyys nollataan
+			acceleration = 0;
+
+			//aika viimeisestä ruudunpäivityksestä
 			float deltaTime = Raylib.GetFrameTime();
 
-			if (Raylib.IsKeyDown(KeyboardKey.Space))
+			if (Raylib.IsKeyDown(KeyboardKey.Space) && fuel > 0)
 			{
 				engineOn = true;
-				velocity.Y -= enginePower * deltaTime;
+				//kuluta polttoainetta
+				fuel -= deltaTime * enginePower;
+				//lisää kiihtyvyyteen moottorin voima ylöspäin
+				acceleration -= enginePower;
 			}
-			if (Raylib.IsKeyReleased(KeyboardKey.Space))
+			else
 			{
 				engineOn = false;
 			}
 
-			acceleration += 9.8f * deltaTime * 10;
-			velocity.Y = acceleration;
+			//lisää kiihtyvyyteen painovoima alaspäin
+			acceleration += 9.8f * 10;
 
-			pos.Y += velocity.Y * Raylib.GetFrameTime() + acceleration * (1/2 * acceleration * acceleration);
+			///summary
+			/// kun lisätään moottorin voima ja painovoima kiihtyvyyteen voidaan kuvitella voimat suuntavektoreina.
+			/// painovoima on aina sama, ja jos moottori on päällä se on myös sama tässä tapauksessa.
+			/// joka ruudunpäivityksessä voimat lisätään kiihtyvyyteen, ja kiihtyvyys lisätään nopeuteen. Tätä varten pitää nollata kiihtyvyys.
+			/// nopeus taas päivittää paikkaa.
+			///
+
+			//lisää kiihtyvyys nopeuteen
+			velocity.Y += acceleration * deltaTime;
+
+			//päivitä sijainti nopeudella ja ruudunpäivityksen ajalla.
+			pos.Y += velocity.Y * deltaTime;
 		}
 
 		public void Draw()
