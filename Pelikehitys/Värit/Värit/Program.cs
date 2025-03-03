@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace Seikkailijanreppu
+﻿namespace Seikkailijanreppu
 {
 	internal class Program
 	{
@@ -19,22 +17,23 @@ namespace Seikkailijanreppu
                 Console.WriteLine("Mitä haluat lisätä?");
 				for (int i = 0; i < tavarat.Count; i++)
 				{
-					Console.WriteLine(i+1 + " - " + tavarat[i].Name);
+					Console.WriteLine(i + 1 + " - " + tavarat[i].Name);
 				}
 				string valinta = Console.ReadLine();
-				Tavara valittuTavara = valinta switch
+				VäritettyTavara<Tavara> valittuTavara = valinta switch
 				{
-					"1" => new Nuoli(),
-					"2" => new Jousi(),
-					"3" => new Vesi(),
-					"4" => new Ruoka_annos(),
-					"5" => new Miekka(),
-					"6" => new Köysi()
+					"1" => new VäritettyTavara<Tavara>(new Nuoli(), ConsoleColor.DarkGray),
+					"2" => new VäritettyTavara<Tavara>(new Jousi(), ConsoleColor.Green),
+					"3" => new VäritettyTavara<Tavara>(new Vesi(), ConsoleColor.Blue),
+					"4" => new VäritettyTavara<Tavara>(new Ruoka_annos(), ConsoleColor.Yellow),
+					"5" => new VäritettyTavara<Tavara>(new Miekka(), ConsoleColor.Red),
+					"6" => new VäritettyTavara<Tavara>(new Köysi(), ConsoleColor.DarkYellow)
 				};
 
 				if (reppu.Lisää(valittuTavara))
 				{
 					Console.Clear();
+					valittuTavara.NaytaTavara();
 					Console.WriteLine(reppu);
 				}
 				else

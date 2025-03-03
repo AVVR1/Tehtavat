@@ -13,7 +13,7 @@ namespace Seikkailijanreppu
 		float tila = 20;
 		float kesto = 30;
 
-		public Tavara[] sisältö { get; private set; } = new Tavara[10];
+		public VäritettyTavara<Tavara>[] sisältö { get; private set; } = new VäritettyTavara<Tavara>[10];
 		public int määrä = 0;
 
 		public Reppu(int rajoitus, float tila, float kesto)
@@ -23,9 +23,9 @@ namespace Seikkailijanreppu
 			this.kesto = kesto;
 		}
 
-		public bool Lisää(Tavara tavara)
+		public bool Lisää(VäritettyTavara<Tavara> tavara)
 		{
-			if (määrä < rajoitus && tavara.tilavuus + laskeTila() <= tila && tavara.paino + LaskePaino() <= kesto)
+			if (määrä < rajoitus && tavara.tavara.tilavuus + laskeTila() <= tila && tavara.tavara.paino + LaskePaino() <= kesto)
 			{
 				sisältö[määrä] = tavara;
 				määrä++;
@@ -37,11 +37,11 @@ namespace Seikkailijanreppu
 		public float laskeTila()
 		{
 			float tila = 0;
-			foreach (Tavara tavara in sisältö)
+			foreach (VäritettyTavara<Tavara> tavara in sisältö)
 			{
 				if (tavara != null)
 				{
-					tila += tavara.tilavuus;
+					tila += tavara.tavara.tilavuus;
 				}
 			}
 			return tila;
@@ -50,11 +50,11 @@ namespace Seikkailijanreppu
 		public float LaskePaino()
 		{
 			float paino = 0;
-			foreach (Tavara tavara in sisältö)
+			foreach (VäritettyTavara<Tavara> tavara in sisältö)
 			{
 				if (tavara !=  null)
 				{
-					paino += tavara.paino;
+					paino += tavara.tavara.paino;
 				}
 			}
 			return paino;
@@ -67,7 +67,7 @@ namespace Seikkailijanreppu
 			{
 				if (sisältö[i] != null)
 				{
-					strings[i] = sisältö[i].ToString();
+					strings[i] = sisältö[i].tavara.ToString();
 				}
 			}
 			return $"Reppussa on seuraavat tavarat: {string.Join(" ", strings)}";

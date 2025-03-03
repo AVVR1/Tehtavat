@@ -6,12 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Värit
+namespace Seikkailijanreppu
 {
 	internal class VäritettyTavara<T>
 	{
-		public VäritettyTavara(Tavara tavara, ConsoleColor color)
+		public T tavara;
+		ConsoleColor color;
+
+		public VäritettyTavara(T tavara, ConsoleColor color)
 		{
+			this.color = color;
+			this.tavara = tavara;
+		}
+
+		public void NaytaTavara()
+		{
+			Console.ForegroundColor = color;
+			Console.WriteLine(tavara?.ToString());
+			Console.ResetColor();
 		}
 	}
 }
