@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,13 +17,14 @@ namespace Koordinaatisto
 			this.X = X;
 			this.Y = Y;
 		}
-		public bool TarkistaViereisetRuudukot()
+		public bool TarkistaViereisetRuudukot(Koordinaatti verrattavaKoordinaatti)
 		{
-            if (MathF.Abs(X) < 2 && MathF.Abs(Y) < 2)
+			if(Vector2.Distance(new Vector2(X, Y), new Vector2(verrattavaKoordinaatti.X, verrattavaKoordinaatti.Y)) <= MathF.Sqrt(2))
             {
 				return true;
             }
             return false;
 		}
 	}
+	//Math.abs(
 }

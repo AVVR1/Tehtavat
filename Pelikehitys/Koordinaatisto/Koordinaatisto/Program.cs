@@ -5,6 +5,8 @@
 		static void Main(string[] args)
 		{
 			Koordinaatti[] koordinaatit = new Koordinaatti[9];
+			Random random = new Random();
+
 			int i = 0;
 			for (int x = -1; x < 2; x++)
 			{
@@ -15,17 +17,22 @@
 				}
 			}
 
+			Koordinaatti verrattavaKoordinaatti = new Koordinaatti(random.Next(-1,2),random.Next(-1,2));
+
             foreach (Koordinaatti koordinaatti in koordinaatit)
 			{
-				if (koordinaatti.TarkistaViereisetRuudukot())
+				if (koordinaatti.TarkistaViereisetRuudukot(verrattavaKoordinaatti))
 				{
-					Console.WriteLine($"Annettu koordinaatti {koordinaatti.X},{koordinaatti.Y} on kordinaatin 0,0 vieressä.");
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.WriteLine($"Annettu koordinaatti {koordinaatti.X},{koordinaatti.Y} on kordinaatin {verrattavaKoordinaatti.X},{verrattavaKoordinaatti.Y} vieressä.");
 				}
 				else
 				{
-					Console.WriteLine($"Annettu koordinaatti {koordinaatti.X},{koordinaatti.Y} ei ole kordinaatin 0,0 vieressä.");
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine($"Annettu koordinaatti {koordinaatti.X},{koordinaatti.Y} ei ole kordinaatin {verrattavaKoordinaatti.X},{verrattavaKoordinaatti.Y} vieressä.");
 				}
 			}
+			Console.ResetColor();
 		}
 	}
 }
