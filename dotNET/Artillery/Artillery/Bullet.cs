@@ -10,7 +10,7 @@ namespace Artillery
 {
 	internal class Bullet
 	{
-		public Vector2 bulletPos;
+		public Vector2 position;
 		Vector2 bulletDir = new Vector2(0,0);
 		//public float bulletSpeed;
 
@@ -27,12 +27,12 @@ namespace Artillery
 			acceleration += gravity * 30;
 
 			velocity += acceleration * deltaTime;
-			bulletPos += velocity * deltaTime;
+			position += velocity * deltaTime;
 		}
 
 		public void Init(Vector2 startPos, Vector2 startDir, float speed)
 		{
-			bulletPos = startPos;
+			position = startPos;
 			bulletDir = startDir;
 			velocity = startDir * speed;
 			velocity = startDir * speed;
@@ -40,7 +40,7 @@ namespace Artillery
 
 		public void Draw()
 		{
-			Raylib.DrawCircleV(bulletPos, 7, Color.White);
+			Raylib.DrawCircleV(position, 7, Color.White);
 		}
 	}
 }

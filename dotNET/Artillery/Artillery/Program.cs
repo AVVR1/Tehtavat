@@ -6,39 +6,59 @@ namespace Artillery
 {
 	internal class Program
 	{
-		static Cannon cannon = new Cannon();
-		static Bullet bullet = null;
-		static Terrain terrain = new Terrain();
 		static void Main(string[] args)
 		{
-			Init();
-			Update();
+			Program game = new Program();
+			game.Init();
+			game.Update();
 		}
 
-		static void Init()
+		static Cannon p1Cannon = new Cannon(new Vector2(200,500),Color.DarkBlue);
+		static Cannon p2Cannon = new Cannon(new Vector2(800,500), Color.Red);
+		Cannon selectedCannon = p1Cannon;
+		Bullet bullet = null;
+		Terrain terrain = new Terrain(20);
+
+		void Init()
 		{
 			Raylib.InitWindow(1000,700,"ARTILLERY");
+			terrain.GenerateTerrain(60);
 		}
-		static void Update()
+		void Update()
 		{
 			while (!Raylib.WindowShouldClose())
 			{
 				Input();
-				cannon.Update();
+				p1Cannon.Update();
+				p2Cannon.Update();
 				if (bullet != null)
 				{
 					bullet.Update();
+					if (bullet.position.X >= Raylib.GetScreenWidth() || bullet.position.X < 0)
+					{
+						if (bullet.position.X > Raylib.GetScreenWidth() + 7 || bullet.position.X < -7)
+						{
+							bullet = null;
+							SwitchTurn();
+						}
+					}
+					else if (Raylib.CheckCollisionPointRec(bullet.position, terrain.terrainPieces[(int)MathF.Floor(bullet.position.X/ terrain.terrainPieceWidth)]))
+					{
+						bullet = null;
+						SwitchTurn();
+					}
 				}
 				Draw();
 			}
 			Raylib.CloseWindow();
 		}
 
-		static void Draw()
+		void Draw()
 		{
 			Raylib.ClearBackground(Color.Black);
 			Raylib.BeginDrawing();
-			cannon.Draw();
+			p1Cannon.Draw();
+			p2Cannon.Draw();
 			terrain.Draw();
 			if (bullet != null)
 			{
@@ -47,29 +67,43 @@ namespace Artillery
 			Raylib.EndDrawing();
 		}
 
-		static void Input()
+		void Input()
 		{
 			if (Raylib.IsKeyDown(KeyboardKey.Right))
 			{
-				if (cannon.IsCannonPastLimit(1))
+				if (selectedCannon.IsCannonPastLimit(1))
 				{
-					cannon.cannonRotation += 60 * Raylib.GetFrameTime();
+					selectedCannon.cannonRotation += 60 * Raylib.GetFrameTime();
 				}
 			}
 
 			if (Raylib.IsKeyDown(KeyboardKey.Left))
 			{
-				if (cannon.IsCannonPastLimit(-1))
+				if (selectedCannon.IsCannonPastLimit(-1))
 				{
-					cannon.cannonRotation -= 60 * Raylib.GetFrameTime();
+					selectedCannon.cannonRotation -= 60 * Raylib.GetFrameTime();
 				}
 			}
 
 			if (Raylib.IsKeyPressed(KeyboardKey.Space))
 			{
-				bullet = new Bullet();
-                Console.WriteLine(cannon.cannonRotation);
-				bullet.Init(cannon.cannonPos + cannon.RotationToVector() * 47, cannon.RotationToVector(), 500);
+				if (bullet == null)
+				{
+					bullet = new Bullet();
+					bullet.Init(selectedCannon.position + selectedCannon.RotationToVector() * 47, selectedCannon.RotationToVector(), 500);
+				}
+			}
+		}
+
+		void SwitchTurn()
+		{
+			if (selectedCannon == p1Cannon)
+			{
+				selectedCannon = p2Cannon;
+			}
+			else
+			{
+				selectedCannon = p1Cannon;
 			}
 		}
 	}

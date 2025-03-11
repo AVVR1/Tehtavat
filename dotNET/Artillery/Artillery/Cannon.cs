@@ -12,19 +12,26 @@ namespace Artillery
 	internal class Cannon
 	{
 		Rectangle cannonRec = new Rectangle(0, 0, 10, 40);
-		Color cannonColor = Color.DarkBlue;
-
 		public float cannonRotation = 0;
-		public float cannonMaxAngle = 75; 
-		public Vector2 cannonPos = new Vector2(200,500);
+		public float cannonMaxAngle = 75;
+
+		public Vector2 position;
+
+		public Color color;
+
+		public Cannon(Vector2 position, Color color)
+		{
+			this.color = color;
+			this.position = position;
+		}
 		public void Update()
 		{
-			cannonRec.Position = cannonPos;
+			cannonRec.Position = position;
 		}
 		public void Draw()
 		{
-			Raylib.DrawCircleV(cannonPos, 20, cannonColor);
-			Raylib.DrawRectanglePro(cannonRec, new Vector2(cannonRec.Size.X / 2,cannonRec.Size.Y), cannonRotation, cannonColor);
+			Raylib.DrawCircleV(position, 20, color);
+			Raylib.DrawRectanglePro(cannonRec, new Vector2(cannonRec.Size.X / 2,cannonRec.Size.Y), cannonRotation, color);
 		}
 
 		public bool IsCannonPastLimit(int prefix)
