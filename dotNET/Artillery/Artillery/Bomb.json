@@ -1,0 +1,6 @@
+{
+	"name": "bomb",
+	"weight": 20,
+	"explosionForce": 30,
+	"size": 7
+}

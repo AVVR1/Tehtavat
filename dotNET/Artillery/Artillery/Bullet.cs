@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Raylib_cs;
+using Newtonsoft.Json;
 
 namespace Artillery
 {
@@ -12,13 +13,44 @@ namespace Artillery
 	{
 		public Vector2 position;
 		Vector2 bulletDir = new Vector2(0,0);
-		//public float bulletSpeed;
+		public Color color = Color.White;
+		public string name = "default_bullet";
+		public float weight = 10;
+		public float explosionForce = 10;
+		public float size = 3;
 
 		Vector2 gravity = new Vector2(0,9.8f);
 		Vector2 velocity;
 		Vector2 acceleration;
 
-		
+		public Bullet(Bullet prefab)
+		{
+			this.name = prefab.name;
+			this.weight = prefab.weight;
+			this.explosionForce = prefab.explosionForce;
+			this.size = prefab.size;
+		}
+
+		public Bullet() { }
+
+		public static Bullet JsonToBullet(string filename)
+		{
+			Bullet bullet = new Bullet();
+			if (File.Exists(filename))
+			{
+				string text = File.ReadAllText(filename);
+				try
+				{
+					bullet = JsonConvert.DeserializeObject<Bullet>(text);
+				}
+				catch (JsonReaderException exp)
+				{
+                    Console.WriteLine(exp.Message);
+				}
+			}
+			return bullet;
+		}
+
 		public void Update()
 		{
 			float deltaTime = Raylib.GetFrameTime();
@@ -34,13 +66,12 @@ namespace Artillery
 		{
 			position = startPos;
 			bulletDir = startDir;
-			velocity = startDir * speed;
-			velocity = startDir * speed;
+			velocity = startDir * (speed * 10) / weight;
 		}
 
 		public void Draw()
 		{
-			Raylib.DrawCircleV(position, 7, Color.White);
+			Raylib.DrawCircleV(position, size, Color.White);
 		}
 	}
 }

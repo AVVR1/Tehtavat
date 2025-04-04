@@ -1,0 +1,6 @@
+{
+	"name": "missile",
+	"weight": 10,
+	"explosionForce": 5,
+	"size": 5
+}
