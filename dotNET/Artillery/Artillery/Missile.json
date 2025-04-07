@@ -1,6 +1,6 @@
 {
 	"name": "missile",
 	"weight": 10,
-	"explosionForce": 5,
+	"explosionForce": 15,
 	"size": 5
 }

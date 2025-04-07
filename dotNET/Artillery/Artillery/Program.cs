@@ -21,6 +21,11 @@ namespace Artillery
 		Terrain terrain = new Terrain(20);
 		float force = 50;
 		int selectedBulletIndex = 0;
+		bool explosion = false;
+		double explosionStartTime = 0;
+		double explosionDuration = 0.1;
+		Bullet lastBullet;
+		bool explosionActive = false;
 
 		void Init()
 		{
@@ -47,6 +52,7 @@ namespace Artillery
 					{
 						if (bullet.position.X > Raylib.GetScreenWidth() + bullet.size || bullet.position.X < -bullet.size)
 						{
+							// out of frame
 							bullet = null;
 							SwitchTurn();
 						}
@@ -54,10 +60,12 @@ namespace Artillery
 					else if (Raylib.CheckCollisionPointRec(bullet.position, GetTerrainRect(bullet.position.X)))
 					{
 						SwitchTurn();
-						if (Raylib.CheckCollisionCircles(selectedCannon.position, 20, bullet.position, bullet.size + bullet.explosionForce))
+						if (Raylib.CheckCollisionCircles(selectedCannon.position, 20, bullet.position, bullet.explosionForce))
 						{
 							//hit player
 						}
+						explosionActive = true;
+						explosionStartTime = Raylib.GetTime();
 						bullet = null;
 					}
 				}
@@ -73,8 +81,15 @@ namespace Artillery
 			p1Cannon.Draw();
 			p2Cannon.Draw();
 			terrain.Draw();
-			Raylib.DrawRectangle(0, 0, 10, (int)force / 10, Color.Red);
+			Raylib.DrawRectangle((int)selectedCannon.position.X - 5, (int)selectedCannon.position.Y, 10, (int)force / 10, Color.Red);
 			Raylib.DrawText(bullets[selectedBulletIndex].name, Raylib.GetScreenWidth()/2 - (bullets[selectedBulletIndex].name.Length * 3), 10, 20, Color.White);
+			if (Raylib.GetTime() - explosionStartTime < explosionDuration && explosionActive)
+			{
+				double time = (Raylib.GetTime() - explosionStartTime) / explosionDuration;
+				Raylib.DrawCircleV(lastBullet.position, lastBullet.explosionForce * (float)time, Color.Yellow);
+				Raylib.DrawCircleV(lastBullet.position, lastBullet.explosionForce * 3 / 4 * (float)time, Color.Orange);
+				Raylib.DrawCircleV(lastBullet.position, lastBullet.explosionForce / 2 * (float)time, Color.Red);
+			}
 			if (bullet != null)
 			{
 				bullet.Draw();
@@ -131,6 +146,7 @@ namespace Artillery
 				if (bullet == null)
 				{
 					bullet = new Bullet(bullets[selectedBulletIndex]);
+					lastBullet = bullet;
 					bullet.Init(selectedCannon.position + selectedCannon.RotationToVector() * (40 + bullets[selectedBulletIndex].size), selectedCannon.RotationToVector(), force);
 					force = 50;
 				}

@@ -18,6 +18,7 @@ namespace Artillery
 		public float weight = 10;
 		public float explosionForce = 10;
 		public float size = 3;
+		public double explosionTime;
 
 		Vector2 gravity = new Vector2(0,9.8f);
 		Vector2 velocity;
