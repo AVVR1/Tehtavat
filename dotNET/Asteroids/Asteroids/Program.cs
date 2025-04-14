@@ -1,5 +1,6 @@
 ﻿using ClassLibrary1;
 using Raylib_cs;
+using System.Numerics;
 
 namespace Asteroids
 {
@@ -26,7 +27,6 @@ namespace Asteroids
 			while (!Raylib.WindowShouldClose())
 			{
 				player.Update();
-				player.Draw();
 				Draw();
 				Input();
 			}
@@ -38,7 +38,7 @@ namespace Asteroids
 		{
 			Raylib.ClearBackground(Color.Black);
 			Raylib.BeginDrawing();
-
+			player.Draw();
 			Raylib.EndDrawing();
 		}
 
@@ -52,6 +52,15 @@ namespace Asteroids
 			if (Raylib.IsKeyDown(KeyboardKey.Left))
 			{
 				player.rotation -= 300 * Raylib.GetFrameTime();
+			}
+
+			if (Raylib.IsKeyDown(KeyboardKey.Up))
+			{
+				player.engineOn = true;
+			} 
+			else
+			{
+				player.engineOn = false;
 			}
 		}
 	}
