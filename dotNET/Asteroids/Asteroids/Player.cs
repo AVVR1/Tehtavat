@@ -10,13 +10,8 @@ using System.Reflection.Metadata;
 
 namespace Asteroids
 {
-    class Player
+    class Player : Movable
     {
-        public Texture2D shipTexture;
-        public Vector2 position = new Vector2(200, 200);
-        public Vector2 direction = new Vector2(0, 1);
-        public float rotation;
-
         public bool engineOn = false;
 
         public Vector2 velocity = Vector2.Zero;
@@ -26,34 +21,17 @@ namespace Asteroids
         public float maxSpeed = 300f;
         float enginePower = 200;
 
+		public static Vector2 hitBox { get; private set; } = new Vector2(10, 50);
+
         public Player()
         {
-
-        }
+			position = new Vector2(200, 200);
+			direction = new Vector2(0, 1);
+		}
 		public void Update()
 		{
             CalculateMovement();
-            int screenWidth = Raylib.GetScreenWidth();
-			int screenHeight = Raylib.GetScreenHeight();
-            int playerWidth = shipTexture.Width;
-            int playerHeight = shipTexture.Height;
-
-			if (position.X > screenWidth + playerWidth)
-            {
-                position.X = -playerWidth;
-            }
-            if (position.Y > screenHeight + playerHeight)
-            {
-                position.Y = -playerHeight;
-            }
-            if (position.X < -playerWidth)
-            {
-                position.X = screenWidth + playerWidth;
-            }
-            if (position.Y < -playerHeight)
-            {
-                position.Y = screenHeight + playerHeight;
-            }
+			WarpToScreen();
         }
 
         private void CalculateMovement()
@@ -74,14 +52,6 @@ namespace Asteroids
 				velocity = Vector2.Normalize(velocity) * maxSpeed;
 			}
 			position += velocity * deltaTime;
-		}
-
-
-        public void Draw()
-        {
-            Class1.DrawTextureRotated(shipTexture, position, rotation);
-            Raylib.DrawLineV(position, position + direction * 200, Color.Red);
-            Raylib.DrawLineV(position, position + velocity, Color.Green);
 		}
 	}
 }
