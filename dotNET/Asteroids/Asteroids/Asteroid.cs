@@ -9,12 +9,25 @@ using ClassLibrary1;
 
 namespace Asteroids
 {
-	internal class Asteroid : Movable
+	//float means circle
+	internal class Asteroid : Movable, ICollidable
 	{
 		string root = "Images/Asteroids/";
 		string beginning = "meteorBrown_";
 		string[] asteroidTextures;
-		float speed = 1;
+		float speed;
+
+		//Variables
+		public float radius = 100f;
+
+		public object hitbox { get; set; } = 40f;
+		public ColliderType colliderType { get; set; } = ColliderType.Circle;
+
+		public void OnCollide()
+		{
+			CollisionManager.collidables.Remove(this);
+            Console.WriteLine("Asteroid collision");
+		}
 
 		public Asteroid(Vector2 position, Vector2 direction, float speed)
 		{
@@ -28,6 +41,7 @@ namespace Asteroids
 				root + beginning + "small1.png",
 				root + beginning + "small2.png",
 			];
+			CollisionManager.collidables.Add(this);
 			this.position = position;
 			this.direction = direction;
 			this.speed = speed;
@@ -36,7 +50,7 @@ namespace Asteroids
 		public void LoadRandomTexture()
 		{
 			Random random = new Random();
-			int randomTextureIndex = random.Next(4);
+			int randomTextureIndex = random.Next(3);
 			texture = Raylib.LoadTexture(asteroidTextures[randomTextureIndex]);
 		}
 
@@ -44,10 +58,6 @@ namespace Asteroids
 		{
 			Movement();
 			WarpToScreen();
-			if (CheckCollisionAsteroidPlayer())
-			{
-
-			}
 		}
 
 		public void Movement()
@@ -55,20 +65,6 @@ namespace Asteroids
 			float deltaTime = Raylib.GetFrameTime();
 			rotation += deltaTime * 50;
 			position += direction * speed * deltaTime;
-		}
-
-		public bool CheckCollisionAsteroidPlayer(Player player)
-		{
-			if (Raylib.CheckCollisionCircleRec(position, texture.Width / 2, new Rectangle(player.position, Player.hitBox)))
-			{
-				return true;
-			}
-			return false;
-		}
-
-		public void Collision()
-		{
-
 		}
 	}
 }

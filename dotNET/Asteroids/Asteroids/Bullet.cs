@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Asteroids
 {
-    class Bullet
+    class Bullet : Movable
     {
         public Bullet()
         {

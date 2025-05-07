@@ -10,7 +10,7 @@ using System.Reflection.Metadata;
 
 namespace Asteroids
 {
-    class Player : Movable
+    class Player : Movable, ICollidable
     {
         public bool engineOn = false;
 
@@ -19,14 +19,16 @@ namespace Asteroids
 
         //variables
         public float maxSpeed = 300f;
-        float enginePower = 200;
+        float enginePower = 200f;
 
-		public static Vector2 hitBox { get; private set; } = new Vector2(10, 50);
+		public object hitbox { get; set; } = new Vector2(30, 70);
+		public ColliderType colliderType { get; set; } = ColliderType.Rectangle;
 
-        public Player()
+		public Player()
         {
 			position = new Vector2(200, 200);
 			direction = new Vector2(0, 1);
+			CollisionManager.collidables.Add(this);
 		}
 		public void Update()
 		{
@@ -52,6 +54,12 @@ namespace Asteroids
 				velocity = Vector2.Normalize(velocity) * maxSpeed;
 			}
 			position += velocity * deltaTime;
+		}
+
+		public void OnCollide()
+		{
+			CollisionManager.collidables.Remove(this);
+            Console.WriteLine("Player Collision");
 		}
 	}
 }
