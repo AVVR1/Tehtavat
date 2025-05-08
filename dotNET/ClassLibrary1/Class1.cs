@@ -38,5 +38,19 @@ namespace ClassLibrary1
 			}
 			return false;
 		}
+
+		public static float GetRandomAngle()
+		{
+			Random random = new Random();
+			return random.NextSingle() * 2 * MathF.PI;
+		}
+
+		public static Vector2 GetRandomDirection()
+		{
+			Random random = new Random();
+			float angle = random.NextSingle() * 2 * MathF.PI;
+			Vector2 direction = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+			return direction;
+		}
 	}
 }

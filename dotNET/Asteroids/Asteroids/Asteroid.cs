@@ -6,30 +6,47 @@ using Raylib_cs;
 using System.Text;
 using System.Threading.Tasks;
 using ClassLibrary1;
+using System.Runtime.CompilerServices;
 
 namespace Asteroids
 {
 	//float means circle
 	internal class Asteroid : Movable, ICollidable
 	{
+
+		public enum AsteroidSize { Big, Medium, Small}
+
 		string root = "Images/Asteroids/";
 		string beginning = "meteorBrown_";
 		string[] asteroidTextures;
 		float speed;
-
-		//Variables
-		public float radius = 100f;
+		AsteroidSize asteroidSize;
 
 		public object hitbox { get; set; } = 40f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
 
 		public void OnCollide()
 		{
+			switch (asteroidSize)
+			{
+				case AsteroidSize.Big:
+					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Medium));
+					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Medium));
+				break;
+				case AsteroidSize.Medium:
+					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Small));
+					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Small));
+				break;
+				case AsteroidSize.Small:
+					//destroy
+				break;
+			}
+			AsteroidManager.asteroids.Remove(this);
 			CollisionManager.collidables.Remove(this);
             Console.WriteLine("Asteroid collision");
 		}
 
-		public Asteroid(Vector2 position, Vector2 direction, float speed)
+		public Asteroid(Vector2 position, Vector2 direction, float speed, AsteroidSize asteroidSize)
 		{
 			asteroidTextures = 
 			[
@@ -41,17 +58,52 @@ namespace Asteroids
 				root + beginning + "small1.png",
 				root + beginning + "small2.png",
 			];
-			CollisionManager.collidables.Add(this);
 			this.position = position;
 			this.direction = direction;
 			this.speed = speed;
+			this.asteroidSize = asteroidSize;
+			LoadRandomTexture();
+			SetHitboxSize();
+			CollisionManager.collidables.Add(this);
+			AsteroidManager.asteroids.Add(this);
 		}
 
 		public void LoadRandomTexture()
 		{
 			Random random = new Random();
-			int randomTextureIndex = random.Next(3);
+			int randomTextureIndex;
+			switch (asteroidSize)
+			{
+				case AsteroidSize.Big:
+					randomTextureIndex = random.Next(3);
+				break;
+				case AsteroidSize.Medium:
+					randomTextureIndex = random.Next(4, 6);
+				break;
+				case AsteroidSize.Small:
+					randomTextureIndex = random.Next(5, 7);
+				break;
+				default:
+					randomTextureIndex = 0;
+				break;
+			}
 			texture = Raylib.LoadTexture(asteroidTextures[randomTextureIndex]);
+		}
+
+		void SetHitboxSize()
+		{
+			switch (asteroidSize)
+			{
+				case AsteroidSize.Big:
+				hitbox = 40f;
+				break;
+				case AsteroidSize.Medium:
+				hitbox = 20f;
+				break;
+				case AsteroidSize.Small:
+				hitbox = 5f;
+				break;
+			}
 		}
 
 		public void Update()

@@ -15,22 +15,13 @@ namespace Asteroids
 
 
 		Player player = new Player();
-		Asteroid asteroid = new Asteroid(new Vector2(600,600), new Vector2(-1,-1),40);
-		Asteroid asteroid2 = new Asteroid(new Vector2(700, 500), new Vector2(-1, -1), 40);
-		Asteroid asteroid3 = new Asteroid(new Vector2(800, 400), new Vector2(-1, -1), 40);
-		Asteroid asteroid4 = new Asteroid(new Vector2(900, 300), new Vector2(-1, -1), 40);
-		Asteroid asteroid5 = new Asteroid(new Vector2(1000, 200), new Vector2(-1, -1), 40);
+		Asteroid asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 10f, Asteroid.AsteroidSize.Big);
 
 
 		void Init()
 		{
 			Raylib.InitWindow(600, 600, "ASTEROIDS");
 			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
-			asteroid.LoadRandomTexture();
-			asteroid2.LoadRandomTexture();
-			asteroid3.LoadRandomTexture();
-			asteroid4.LoadRandomTexture();
-			asteroid5.LoadRandomTexture();
 			//kaikki ladattu --> Gameloop
 			GameLoop();
 		}
@@ -44,10 +35,6 @@ namespace Asteroids
 			}
 			Raylib.UnloadTexture(player.texture);
 			Raylib.UnloadTexture(asteroid.texture);
-			Raylib.UnloadTexture(asteroid2.texture);
-			Raylib.UnloadTexture(asteroid3.texture);
-			Raylib.UnloadTexture(asteroid4.texture);
-			Raylib.UnloadTexture(asteroid5.texture);
 			Raylib.CloseWindow();
 		}
 
@@ -55,10 +42,7 @@ namespace Asteroids
 		{
 			player.Update();
 			asteroid.Update();
-			asteroid2.Update();
-			asteroid3.Update();
-			asteroid4.Update();
-			asteroid5.Update();
+			Class1.GetRandomAngle();
 			Input();
 			CollisionManager.CheckCollisions();
 		}
@@ -69,10 +53,6 @@ namespace Asteroids
 			Raylib.BeginDrawing();
 			player.Draw();
 			asteroid.Draw();
-			asteroid2.Draw();
-			asteroid3.Draw();
-			asteroid4.Draw();
-			asteroid5.Draw();
 
 			//Class1.DrawHitboxRotated(player.position, (Vector2)player.hitbox, player.rotation, Color.Red);
 			Raylib.EndDrawing();
