@@ -15,16 +15,22 @@ namespace Asteroids
 
 
 		Player player = new Player();
-		Asteroid asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 10f, Asteroid.AsteroidSize.Big);
+		Asteroid asteroid;
 
 
 		void Init()
 		{
 			Raylib.InitWindow(600, 600, "ASTEROIDS");
-			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
+			Start();
 			//kaikki ladattu --> Gameloop
 			GameLoop();
 		}
+
+		void Start()
+		{
+            player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
+			asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 50f, Asteroid.AsteroidSize.Big);
+        }
 
 		void GameLoop()
 		{
@@ -41,8 +47,8 @@ namespace Asteroids
 		void Update()
 		{
 			player.Update();
-			asteroid.Update();
-			Class1.GetRandomAngle();
+			AsteroidManager.UpdateAsteroids();
+            Class1.GetRandomAngle();
 			Input();
 			CollisionManager.CheckCollisions();
 		}
@@ -52,10 +58,10 @@ namespace Asteroids
 			Raylib.ClearBackground(Color.Black);
 			Raylib.BeginDrawing();
 			player.Draw();
-			asteroid.Draw();
+			AsteroidManager.DrawAsteroids();
 
-			//Class1.DrawHitboxRotated(player.position, (Vector2)player.hitbox, player.rotation, Color.Red);
-			Raylib.EndDrawing();
+            //Class1.DrawHitboxRotated(player.position, (Vector2)player.hitbox, player.rotation, Color.Red);
+            Raylib.EndDrawing();
 		}
 
 		void Input()

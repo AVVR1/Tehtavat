@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ClassLibrary1;
 using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Asteroids
 {
@@ -30,19 +31,20 @@ namespace Asteroids
 			switch (asteroidSize)
 			{
 				case AsteroidSize.Big:
-					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Medium));
-					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Medium));
+                    AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium));
+                    AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium));
 				break;
 				case AsteroidSize.Medium:
-					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Small));
-					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 20, Class1.GetRandomDirection(), 10f, AsteroidSize.Small));
+					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small));
+					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small));
 				break;
 				case AsteroidSize.Small:
-					//destroy
+					
 				break;
 			}
 			AsteroidManager.asteroids.Remove(this);
 			CollisionManager.collidables.Remove(this);
+			
             Console.WriteLine("Asteroid collision");
 		}
 
@@ -84,10 +86,10 @@ namespace Asteroids
 					randomTextureIndex = random.Next(5, 7);
 				break;
 				default:
-					randomTextureIndex = 0;
-				break;
-			}
-			texture = Raylib.LoadTexture(asteroidTextures[randomTextureIndex]);
+                    randomTextureIndex = 0;
+                    break;
+            }
+            texture = Raylib.LoadTexture(asteroidTextures[randomTextureIndex]);
 		}
 
 		void SetHitboxSize()
