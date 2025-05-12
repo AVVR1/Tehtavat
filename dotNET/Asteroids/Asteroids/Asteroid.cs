@@ -17,9 +17,6 @@ namespace Asteroids
 
 		public enum AsteroidSize { Big, Medium, Small}
 
-		string root = "Images/Asteroids/";
-		string beginning = "meteorBrown_";
-		string[] asteroidTextures;
 		float speed;
 		AsteroidSize asteroidSize;
 
@@ -31,15 +28,15 @@ namespace Asteroids
 			switch (asteroidSize)
 			{
 				case AsteroidSize.Big:
-                    AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium));
-                    AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium));
+                    new Asteroid(position + Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium);
+                    new Asteroid(position + -Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium);
 				break;
 				case AsteroidSize.Medium:
-					AsteroidManager.asteroids.Add(new Asteroid(position + Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small));
-					AsteroidManager.asteroids.Add(new Asteroid(position + -Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small));
+					new Asteroid(position + Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small);
+					new Asteroid(position + -Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small);
 				break;
 				case AsteroidSize.Small:
-					
+                
 				break;
 			}
 			AsteroidManager.asteroids.Remove(this);
@@ -50,16 +47,6 @@ namespace Asteroids
 
 		public Asteroid(Vector2 position, Vector2 direction, float speed, AsteroidSize asteroidSize)
 		{
-			asteroidTextures = 
-			[
-				root + beginning + "big1.png",
-				root + beginning + "big3.png",
-				root + beginning + "big4.png",
-				root + beginning + "med1.png",
-				root + beginning + "med3.png",
-				root + beginning + "small1.png",
-				root + beginning + "small2.png",
-			];
 			this.position = position;
 			this.direction = direction;
 			this.speed = speed;
@@ -80,7 +67,7 @@ namespace Asteroids
 					randomTextureIndex = random.Next(3);
 				break;
 				case AsteroidSize.Medium:
-					randomTextureIndex = random.Next(4, 6);
+					randomTextureIndex = random.Next(3, 5);
 				break;
 				case AsteroidSize.Small:
 					randomTextureIndex = random.Next(5, 7);
@@ -89,7 +76,7 @@ namespace Asteroids
                     randomTextureIndex = 0;
                     break;
             }
-            texture = Raylib.LoadTexture(asteroidTextures[randomTextureIndex]);
+            texture = AsteroidManager.textures[randomTextureIndex];
 		}
 
 		void SetHitboxSize()
