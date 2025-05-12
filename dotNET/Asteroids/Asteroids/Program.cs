@@ -49,7 +49,8 @@ namespace Asteroids
 		{
 			player.Update();
 			AsteroidManager.UpdateAsteroids();
-            Class1.GetRandomAngle();
+			Bullet.UpdateBullets();
+			Class1.GetRandomAngle();
 			Input();
 			CollisionManager.CheckCollisions();
 		}
@@ -60,9 +61,8 @@ namespace Asteroids
 			Raylib.BeginDrawing();
 			player.Draw();
 			AsteroidManager.DrawAsteroids();
-
-            //Class1.DrawHitboxRotated(player.position, (Vector2)player.hitbox, player.rotation, Color.Red);
-            Raylib.EndDrawing();
+			Bullet.DrawBullets();
+			Raylib.EndDrawing();
 		}
 
 		void Input()

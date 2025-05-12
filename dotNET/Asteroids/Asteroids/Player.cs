@@ -34,7 +34,12 @@ namespace Asteroids
 		{
             CalculateMovement();
 			WarpToScreen();
-        }
+			if (Raylib.IsKeyPressed(KeyboardKey.Space))
+			{
+                Console.WriteLine("Space");
+				new Bullet(position + direction * 50, direction, rotation);
+			}
+		}
 
         private void CalculateMovement()
         {
