@@ -34,13 +34,22 @@ namespace Asteroids
 			}
 		}
 
-        public static void UpdateAsteroids()
+        public static void UnloadTextures()
+        {
+            foreach (Texture2D texture in textures)
+            {
+                Raylib.UnloadTexture(texture);
+            }
+        }
+
+		public static void UpdateAsteroids()
         {
             foreach (Asteroid asteroid in asteroids)
             {
                 asteroid.Update();
             }
         }
+
         public static void DrawAsteroids()
         {
             foreach (Asteroid asteroid in asteroids)

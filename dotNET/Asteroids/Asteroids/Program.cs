@@ -29,7 +29,8 @@ namespace Asteroids
 		void Start()
 		{
 			AsteroidManager.InitTextures();
-            player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
+			Bullet.texture = Raylib.LoadTexture("Images/laserBlue01.png");
+			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
 			asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 50f, Asteroid.AsteroidSize.Big);
         }
 
@@ -41,7 +42,7 @@ namespace Asteroids
 				Draw();
 			}
 			Raylib.UnloadTexture(player.texture);
-			Raylib.UnloadTexture(asteroid.texture);
+			AsteroidManager.UnloadTextures();
 			Raylib.CloseWindow();
 		}
 
