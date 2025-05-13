@@ -15,11 +15,10 @@ namespace Asteroids
 		public Vector2 direction = new Vector2();
 		public Texture2D texture;
 		public float rotation = 0;
-
+		 
 		public void Draw()
 		{
 			Class1.DrawTextureRotated(texture, position, rotation);
-			Raylib.DrawLineV(position, position + direction * 200, Color.Red);
 		}
 
 		public void WarpToScreen()

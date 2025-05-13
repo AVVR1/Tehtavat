@@ -31,12 +31,12 @@ namespace Asteroids
 			switch (asteroidSize)
 			{
 				case AsteroidSize.Big:
-					new Asteroid(position + dir * distance * 20, dir + direction, speed, AsteroidSize.Medium);
-                    new Asteroid(position - dir * (1 - distance) * 20, -dir + direction, speed, AsteroidSize.Medium);
+					new Asteroid(position + dir * distance * 40, dir + direction, speed, AsteroidSize.Medium);
+                    new Asteroid(position - dir * (1 - distance) * 40, -dir + direction, speed, AsteroidSize.Medium);
 				break;
 				case AsteroidSize.Medium:
-					new Asteroid(position + dir * distance * 10, dir + direction, speed, AsteroidSize.Small);
-					new Asteroid(position - dir * (1 - distance) * 10, -dir + direction, speed, AsteroidSize.Small);
+					new Asteroid(position + dir * distance * 20, dir + direction, speed, AsteroidSize.Small);
+					new Asteroid(position - dir * (1 - distance) * 20, -dir + direction, speed, AsteroidSize.Small);
 				break;
 				case AsteroidSize.Small:
                 
@@ -44,8 +44,6 @@ namespace Asteroids
 			}
 			AsteroidManager.asteroids.Remove(this);
 			CollisionManager.collidables.Remove(this);
-			
-            Console.WriteLine("Asteroid collision");
 		}
 
 		public Asteroid(Vector2 position, Vector2 direction, float speed, AsteroidSize asteroidSize)
