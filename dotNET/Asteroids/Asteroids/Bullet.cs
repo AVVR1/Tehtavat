@@ -59,14 +59,14 @@ namespace Asteroids
 
 		public static void UpdateBullets()
 		{
-			for (int i = bullets.Count - 1; i > 0; i--)
+			for (int i = bullets.Count - 1; i >= 0; i--)
 			{
 				bullets[i].Update();
 			}
 		}
 		public static void DrawBullets()
 		{
-			for (int i = bullets.Count - 1; i > 0; i--)
+			for (int i = bullets.Count - 1; i >= 0; i--)
 			{
 				bullets[i].Draw();
 			}
