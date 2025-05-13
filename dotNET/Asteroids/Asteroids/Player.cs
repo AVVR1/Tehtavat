@@ -14,6 +14,8 @@ namespace Asteroids
     {
         public bool engineOn = false;
 
+		public bool isAlive = true;
+
         public Vector2 velocity = Vector2.Zero;
         Vector2 acceleration = Vector2.Zero;
 
@@ -26,7 +28,7 @@ namespace Asteroids
 
 		public Player()
         {
-			position = new Vector2(200, 200);
+			position = new Vector2(400, 300);
 			direction = new Vector2(0, 1);
 			CollisionManager.collidables.Add(this);
 		}
@@ -63,7 +65,7 @@ namespace Asteroids
 		public void OnCollide()
 		{
 			CollisionManager.collidables.Remove(this);
-            Console.WriteLine("Player Collision");
-		}
+            isAlive = false;
+        }
 	}
 }

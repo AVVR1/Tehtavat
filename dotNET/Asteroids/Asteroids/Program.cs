@@ -16,7 +16,7 @@ namespace Asteroids
 
 		void Init()
 		{
-			Raylib.InitWindow(600, 600, "ASTEROIDS");
+			Raylib.InitWindow(800, 600, "ASTEROIDS");
 			Start();
 			//kaikki ladattu --> Gameloop
 			GameLoop();
@@ -50,7 +50,11 @@ namespace Asteroids
 			Input();
 			CollisionManager.CheckCollisions();
 			AsteroidManager.CheckForNextWave(player.position);
-		}
+			if (!player.isAlive)
+            {
+				player = null;
+            }
+        }
 
 		void Draw()
 		{
@@ -59,8 +63,12 @@ namespace Asteroids
 			player.Draw();
 			AsteroidManager.DrawAsteroids();
 			Bullet.DrawBullets();
+			if (player.isAlive == false)
+            {
+                Raylib.DrawText("GAME OVER", 250, 275, 50, Color.Red);
+            }
 			Raylib.EndDrawing();
-		}
+        }
 
 		void Input()
 		{
