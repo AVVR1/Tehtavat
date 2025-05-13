@@ -28,14 +28,14 @@ namespace Asteroids
 
 		public static void CheckCollisions()
 		{
-			for (int i = collidables.Count -1; i > 0; i--)
+			for (int i = collidables.Count -1; i >= 0; i--)
 			{
-				if (i >= collidables.Count)
+				if (i >= collidables.Count && i != 0)
 				{
 					i = collidables.Count - 1;
 				}
 				ICollidable c1 = collidables[i];
-				for (int j = i - 1; j > 0; j--)
+				for (int j = i - 1; j >= 0; j--)
 				{
 					ICollidable c2 = collidables[j];
 					if (c1 != c2)
