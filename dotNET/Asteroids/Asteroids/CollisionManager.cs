@@ -34,6 +34,10 @@ namespace Asteroids
 				{
 					i = collidables.Count - 1;
 				}
+				if (i >= collidables.Count)
+				{
+					break;
+				}
 				ICollidable c1 = collidables[i];
 				for (int j = i - 1; j >= 0; j--)
 				{
