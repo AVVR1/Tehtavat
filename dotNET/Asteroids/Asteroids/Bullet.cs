@@ -14,11 +14,14 @@ namespace Asteroids
 		public object hitbox { get; set; } = 10f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
 
+		public static Texture2D bulletTexture;
+
 		float timer = 0f;
 		float maxLifetime = 1f;
 
 		public Bullet(Vector2 position, Vector2 direction, float rotation)
 		{
+			texture = bulletTexture;
 			this.position = position;
 			this.direction = direction;
 			this.rotation = rotation;
@@ -28,7 +31,7 @@ namespace Asteroids
 
 		public static void InitTexture()
 		{
-			texture = Raylib.LoadTexture("Images/laserBlue01.png");
+			bulletTexture = Raylib.LoadTexture("Images/laserBlue01.png");
 		}
 
 		public void OnCollide()

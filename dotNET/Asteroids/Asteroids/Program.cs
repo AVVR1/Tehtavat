@@ -29,7 +29,7 @@ namespace Asteroids
 		void Start()
 		{
 			AsteroidManager.InitTextures();
-			Bullet.texture = Raylib.LoadTexture("Images/laserBlue01.png");
+			Bullet.InitTexture();
 			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
 			asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 50f, Asteroid.AsteroidSize.Big);
         }
