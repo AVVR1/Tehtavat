@@ -27,6 +27,8 @@ namespace Asteroids
         static float minSpeed = 50f;
         static float maxSpeed = 75f;
 
+        static int difficulty = 0;
+
 		public static void InitTextures()
         {
 			asteroidTextures =
@@ -83,6 +85,15 @@ namespace Asteroids
             Vector2 direction = Class1.GetRandomDirection();
             float distance = Class1.GetRandomValueBetween(spawnProtectionRadius, maxDistance, random);
 			return direction * distance + playerPos;
+		}
+
+        public static void CheckForNextWave(Vector2 playerPos)
+        {
+			if (asteroids.Count == 0)
+			{
+				SpawnAsteroidWave(difficulty, playerPos);
+                difficulty++;
+			}
 		}
 	}
 }

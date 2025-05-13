@@ -12,11 +12,7 @@ namespace Asteroids
 			game.Init();
 		}
 
-
-
 		Player player = new Player();
-		Asteroid asteroid;
-
 
 		void Init()
 		{
@@ -31,7 +27,6 @@ namespace Asteroids
 			AsteroidManager.InitTextures();
 			Bullet.InitTexture();
 			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
-			asteroid = new Asteroid(new Vector2(600, 600), new Vector2(-1, -1), 50f, Asteroid.AsteroidSize.Big);
         }
 
 		void GameLoop()
@@ -54,6 +49,7 @@ namespace Asteroids
 			Class1.GetRandomAngle();
 			Input();
 			CollisionManager.CheckCollisions();
+			AsteroidManager.CheckForNextWave(player.position);
 		}
 
 		void Draw()

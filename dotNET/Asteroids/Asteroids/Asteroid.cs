@@ -14,7 +14,6 @@ namespace Asteroids
 	//float means circle
 	internal class Asteroid : Movable, ICollidable
 	{
-
 		public enum AsteroidSize { Big, Medium, Small}
 
 		float speed;
@@ -23,17 +22,21 @@ namespace Asteroids
 		public object hitbox { get; set; } = 40f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
 
+		Random random = new Random();
+
 		public void OnCollide()
 		{
+			Vector2 dir = Class1.GetRandomDirection();
+			float distance = random.NextSingle();
 			switch (asteroidSize)
 			{
 				case AsteroidSize.Big:
-                    new Asteroid(position + Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium);
-                    new Asteroid(position + -Vector2.UnitX * 85, Class1.GetRandomDirection() + direction, 15f, AsteroidSize.Medium);
+					new Asteroid(position + dir * distance * 20, dir + direction, speed, AsteroidSize.Medium);
+                    new Asteroid(position - dir * (1 - distance) * 20, -dir + direction, speed, AsteroidSize.Medium);
 				break;
 				case AsteroidSize.Medium:
-					new Asteroid(position + Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small);
-					new Asteroid(position + -Vector2.UnitX * 45, Class1.GetRandomDirection() + direction, 20f, AsteroidSize.Small);
+					new Asteroid(position + dir * distance * 10, dir + direction, speed, AsteroidSize.Small);
+					new Asteroid(position - dir * (1 - distance) * 10, -dir + direction, speed, AsteroidSize.Small);
 				break;
 				case AsteroidSize.Small:
                 
