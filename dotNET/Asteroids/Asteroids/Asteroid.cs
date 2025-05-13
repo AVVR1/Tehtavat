@@ -90,7 +90,7 @@ namespace Asteroids
 				hitbox = 20f;
 				break;
 				case AsteroidSize.Small:
-				hitbox = 5f;
+				hitbox = 10f;
 				break;
 			}
 		}

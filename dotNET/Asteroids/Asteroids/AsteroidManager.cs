@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using ClassLibrary1;
+using Raylib_cs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,16 @@ namespace Asteroids
 		static string root = "Images/Asteroids/meteorBrown_";
         static string[] asteroidTextures = new string[7];
 		public static Texture2D[] textures = new Texture2D[7];
+
+        static Random random = new Random();
+
+        // Spawn area
+        static float spawnProtectionRadius = 200f;
+        static float maxDistance = 500f;
+
+        //Speed
+        static float minSpeed = 50f;
+        static float maxSpeed = 75f;
 
 		public static void InitTextures()
         {
@@ -57,5 +68,21 @@ namespace Asteroids
                 asteroid.Draw();
             }
         }
-    }
+
+        public static void SpawnAsteroidWave(int difficulty, Vector2 playerPos)
+        {
+            float speed = Class1.GetRandomValueBetween(minSpeed, maxSpeed, random);
+            for (int i = 0; i < 4 + difficulty; i++)
+			{
+			    new Asteroid(GetSpawnPosition(playerPos), Class1.GetRandomDirection(), speed, Asteroid.AsteroidSize.Big);
+			}
+		}
+
+        static Vector2 GetSpawnPosition(Vector2 playerPos)
+		{
+            Vector2 direction = Class1.GetRandomDirection();
+            float distance = Class1.GetRandomValueBetween(spawnProtectionRadius, maxDistance, random);
+			return direction * distance + playerPos;
+		}
+	}
 }

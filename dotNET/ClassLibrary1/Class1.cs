@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using System;
 using System.Numerics;
 
 namespace ClassLibrary1
@@ -47,10 +48,14 @@ namespace ClassLibrary1
 
 		public static Vector2 GetRandomDirection()
 		{
-			Random random = new Random();
-			float angle = random.NextSingle() * 2 * MathF.PI;
+			float angle = GetRandomAngle();
 			Vector2 direction = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
 			return direction;
+		}
+
+		public static float GetRandomValueBetween(float min, float max, Random random)
+		{
+			return min + random.NextSingle() * (max - min);
 		}
 	}
 }
