@@ -26,6 +26,9 @@ namespace Asteroids
 			b = tuple.Item2;
 		}
 
+		//TODO: Find out why collision is not happening after respawn
+
+
 		public static void CheckCollisions()
 		{
 			for (int i = collidables.Count -1; i >= 0; i--)

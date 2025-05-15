@@ -36,7 +36,6 @@ namespace Asteroids
 
 		public void OnCollide()
 		{
-            Console.WriteLine("Bullet colide");
 			Remove();
 		}
 

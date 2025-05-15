@@ -12,35 +12,69 @@ namespace Asteroids
 {
     class Player : Movable, ICollidable
     {
-        public bool engineOn = false;
-
 		public bool isAlive = true;
+        bool engineOn = false;
+        bool hit = false;
+        public bool drawTexture = true;
 
-        public Vector2 velocity = Vector2.Zero;
+        Vector2 velocity = Vector2.Zero;
         Vector2 acceleration = Vector2.Zero;
 
         //variables
-        public float maxSpeed = 300f;
+        float maxSpeed = 300f;
         float enginePower = 200f;
+		public int lives = 3;
+        Vector2 spawnPosition = new Vector2(400, 300);
 
-		public object hitbox { get; set; } = new Vector2(30, 70);
+        float timer = 0f;
+        float invincibilityTime = 3f;
+
+        public object hitbox { get; set; } = new Vector2(30, 70);
 		public ColliderType colliderType { get; set; } = ColliderType.Rectangle;
 
 		public Player()
         {
-			position = new Vector2(400, 300);
+			position = spawnPosition;
 			direction = new Vector2(0, 1);
 			CollisionManager.collidables.Add(this);
 		}
 		public void Update()
 		{
+            if (!isAlive) return;
+            Input();
             CalculateMovement();
 			WarpToScreen();
-			if (Raylib.IsKeyPressed(KeyboardKey.Space))
-			{
-				new Bullet(position + direction * 50, direction, rotation);
-			}
-		}
+            if (hit)
+            {
+                InvincibilityTimer();
+            }
+        }
+
+		private void Input()
+		{
+            if (Raylib.IsKeyDown(KeyboardKey.Right))
+            {
+                rotation += 300 * Raylib.GetFrameTime();
+                rotation %= 360;
+            }
+            if (Raylib.IsKeyDown(KeyboardKey.Left))
+            {
+                rotation -= 300 * Raylib.GetFrameTime();
+                rotation %= 360;
+            }
+            if (Raylib.IsKeyDown(KeyboardKey.Up))
+            {
+                engineOn = true;
+            }
+            else
+            {
+                engineOn = false;
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.Space))
+            {
+                new Bullet(position + direction * 50, direction, rotation);
+            }
+        }
 
         private void CalculateMovement()
         {
@@ -64,8 +98,35 @@ namespace Asteroids
 
 		public void OnCollide()
 		{
-			CollisionManager.collidables.Remove(this);
-            isAlive = false;
+            Console.WriteLine("HIT");
+			lives--;
+            Respawn();
+            if (lives <= 0)
+			{
+                isAlive = false;
+            }
+        }
+
+        void InvincibilityTimer()
+        {
+            timer += Raylib.GetFrameTime();
+            drawTexture = (MathF.Round(timer,1) % 0.5f == 0) ? true : false;
+            if (timer >= invincibilityTime)
+            {
+                Console.WriteLine("end invincibility");
+                hit = false;
+                timer = 0f;
+                CollisionManager.collidables.Add(this);
+            }
+        }
+
+        void Respawn()
+        {
+            hit = true;
+            CollisionManager.collidables.Remove(this);
+            position = spawnPosition;
+            velocity = Vector2.Zero;
+            rotation = 0;
         }
 	}
 }

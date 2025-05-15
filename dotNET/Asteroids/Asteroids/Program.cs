@@ -6,7 +6,7 @@ namespace Asteroids
 {
 	internal class Program
 	{
-		static void Main(string[] args)
+        static void Main(string[] args)
 		{
 			Program game = new Program();
 			game.Init();
@@ -14,7 +14,7 @@ namespace Asteroids
 
 		Player player = new Player();
 
-		void Init()
+        void Init()
 		{
 			Raylib.InitWindow(800, 600, "ASTEROIDS");
 			Start();
@@ -33,8 +33,8 @@ namespace Asteroids
 		{
 			while (!Raylib.WindowShouldClose())
 			{
-				Update();
-				Draw();
+                Update();
+                Draw();
 			}
 			Raylib.UnloadTexture(player.texture);
 			AsteroidManager.UnloadTextures();
@@ -46,52 +46,30 @@ namespace Asteroids
 			player.Update();
 			AsteroidManager.UpdateAsteroids();
 			Bullet.UpdateBullets();
-			Class1.GetRandomAngle();
-			Input();
 			CollisionManager.CheckCollisions();
 			AsteroidManager.CheckForNextWave(player.position);
-			if (!player.isAlive)
-            {
-				player = null;
-            }
         }
 
 		void Draw()
 		{
 			Raylib.ClearBackground(Color.Black);
 			Raylib.BeginDrawing();
-			player.Draw();
-			AsteroidManager.DrawAsteroids();
+
 			Bullet.DrawBullets();
-			if (player.isAlive == false)
+			AsteroidManager.DrawAsteroids();
+			if (player.isAlive)
+			{
+				if (player.drawTexture)
+				{
+					player.Draw();
+				}
+			}
+			else
             {
                 Raylib.DrawText("GAME OVER", 250, 275, 50, Color.Red);
             }
+
 			Raylib.EndDrawing();
         }
-
-		void Input()
-		{
-			if (Raylib.IsKeyDown(KeyboardKey.Right))
-			{
-				player.rotation += 300 * Raylib.GetFrameTime();
-				player.rotation %= 360;
-			}
-
-			if (Raylib.IsKeyDown(KeyboardKey.Left))
-			{
-				player.rotation -= 300 * Raylib.GetFrameTime();
-				player.rotation %= 360;
-			}
-
-			if (Raylib.IsKeyDown(KeyboardKey.Up))
-			{
-				player.engineOn = true;
-			} 
-			else
-			{
-				player.engineOn = false;
-			}
-		}
 	}
 }
