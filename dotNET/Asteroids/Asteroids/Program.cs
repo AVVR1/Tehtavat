@@ -59,6 +59,7 @@ namespace Asteroids
 			AsteroidManager.DrawAsteroids();
 			if (player.isAlive)
 			{
+				Raylib.DrawText($"Lives: {player.lives}", 10, 5, 20, Color.White);
 				if (player.drawTexture)
 				{
 					player.Draw();
