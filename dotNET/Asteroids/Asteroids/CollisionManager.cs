@@ -19,6 +19,13 @@ namespace Asteroids
 			collidables = new List<ICollidable>();
 		}
 
+		/// <summary>
+		/// Returns a tuple of the two collidables, ordered by their colliderType.
+		/// <br></br>The colliders come out in the same order they are created.
+		/// </summary>
+		/// <param name="a"></param>
+		/// <param name="b"></param>
+		/// <returns></returns>
 		public static (ICollidable, ICollidable) Normalize(ICollidable a, ICollidable b)
 		{
 			(ICollidable,ICollidable) tuple = a.colliderType <= b.colliderType ? (a, b) : (b, a);
@@ -29,23 +36,21 @@ namespace Asteroids
 		{
 			for (int i = collidables.Count -1; i >= 0; i--)
 			{
-				if (i >= collidables.Count && i != 0)
-				{
-					i = collidables.Count - 1;
-				}
-				if (i >= collidables.Count)
-				{
-					break;
-				}
-				ICollidable c1 = collidables[i];
 				for (int j = i -1; j >= 0; j--)
 				{
+					if (i >= collidables.Count && i != 0)
+					{
+						i = collidables.Count - 1;
+					}
+					if (i >= collidables.Count)
+					{
+						break;
+					}
+					ICollidable c1 = collidables[i];
 					ICollidable c2 = collidables[j];
 
-					//Console.WriteLine($"{i} vs {j}");
-
-					Raylib.DrawText($"{i}: {collidables[i].colliderType.ToString()}", 0, i * 30, 20, Color.White);
-					Raylib.DrawText($"{j}: {collidables[j].colliderType.ToString()}", 150, j * 30, 20, Color.White);
+					Raylib.DrawText($"{i}: {c1.colliderType.ToString()}", 0, i * 30, 20, Color.White);
+					Raylib.DrawText($"{j}: {c2.colliderType.ToString()}", 150, j * 30, 20, Color.White);
 
 					(c1, c2) = Normalize(c1, c2);
 
