@@ -14,9 +14,8 @@ namespace Asteroids
 
 	public interface ICollidable
 	{
-		public object hitbox { get; set; }
-
 		public ColliderType colliderType { get; set; }
+		public object hitbox { get; set; }
 
 		public void OnCollide(ICollidable collider);
 	}

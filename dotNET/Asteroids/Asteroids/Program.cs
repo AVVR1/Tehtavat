@@ -46,7 +46,9 @@ namespace Asteroids
 			player.Update();
 			AsteroidManager.UpdateAsteroids();
 			Bullet.UpdateBullets();
+			Ufo.UpdateUfos();
 			CollisionManager.CheckCollisions();
+			Ufo.UfoTimer(player.position);
 			AsteroidManager.CheckForNextWave(player.position);
         }
 

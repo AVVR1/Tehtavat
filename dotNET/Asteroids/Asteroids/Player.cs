@@ -30,8 +30,8 @@ namespace Asteroids
         public float points = 0;
         float timer = 0f;
 
-        public object hitbox { get; set; } = new Vector2(30, 70);
 		public ColliderType colliderType { get; set; } = ColliderType.Rectangle;
+        public object hitbox { get; set; } = new Vector2(30, 70);
 
 		public Player()
         {
