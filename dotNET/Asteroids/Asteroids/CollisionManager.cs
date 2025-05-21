@@ -42,16 +42,21 @@ namespace Asteroids
 					{
 						i = collidables.Count - 1;
 					}
+					if (j >= i && j != 0)
+					{
+						j = i - 1;
+					}
 					if (i >= collidables.Count)
 					{
 						break;
 					}
+					if (j >= i)
+					{
+						Console.BackgroundColor = ConsoleColor.Red;
+						break;
+					}
 					ICollidable c1 = collidables[i];
 					ICollidable c2 = collidables[j];
-
-					Raylib.DrawText($"{i}: {c1.colliderType.ToString()}", 0, i * 30, 20, Color.White);
-					Raylib.DrawText($"{j}: {c2.colliderType.ToString()}", 150, j * 30, 20, Color.White);
-
 					(c1, c2) = Normalize(c1, c2);
 
 					Movable m1 = (Movable)c1;
