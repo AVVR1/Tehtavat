@@ -18,6 +18,6 @@ namespace Asteroids
 
 		public ColliderType colliderType { get; set; }
 
-		public void OnCollide();
+		public void OnCollide(ICollidable collider);
 	}
 }

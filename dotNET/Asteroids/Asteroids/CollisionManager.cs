@@ -62,28 +62,27 @@ namespace Asteroids
 					Movable m1 = (Movable)c1;
 					Movable m2 = (Movable)c2;
 
-
 					switch (c1.colliderType, c2.colliderType)
 					{
 						case (ColliderType.Circle, ColliderType.Circle):
 							if (Raylib.CheckCollisionCircles(m1.position, (float)c1.hitbox, m2.position, (float)c2.hitbox))
 							{
-								c1.OnCollide();
-								c2.OnCollide();
+								c1.OnCollide(c2);
+								c2.OnCollide(c1);
 							}
 						break;
 						case (ColliderType.Circle, ColliderType.Rectangle):
 							if (Class1.CheckCollisionCircleRecPro(m1.position, (float)c1.hitbox, new Rectangle(m2.position, (Vector2)c2.hitbox), m2.rotation))
 							{
-								c1.OnCollide();
-								c2.OnCollide();
+								c1.OnCollide(c2);
+								c2.OnCollide(c1);
 							}
 						break;
 						case (ColliderType.Rectangle,ColliderType.Rectangle):
 							if (Raylib.CheckCollisionRecs(new Rectangle(m1.position, (Vector2)c1.hitbox), new Rectangle(m2.position, (Vector2)c2.hitbox)))
 							{
-								c1.OnCollide();
-								c2.OnCollide();
+								c1.OnCollide(c2);
+								c2.OnCollide(c1);
 							}
 						break;
 					}

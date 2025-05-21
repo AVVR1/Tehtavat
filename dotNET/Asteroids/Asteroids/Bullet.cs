@@ -11,10 +11,10 @@ namespace Asteroids
 	class Bullet : Movable, ICollidable
 	{
 		public static List<Bullet> bullets = new List<Bullet>();
+		public static Texture2D bulletTexture;
 		public object hitbox { get; set; } = 10f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
-
-		public static Texture2D bulletTexture;
+		Player player;
 
 		float timer = 0f;
 		float maxLifetime = 1f;
@@ -34,9 +34,10 @@ namespace Asteroids
 			bulletTexture = Raylib.LoadTexture("Images/laserBlue01.png");
 		}
 
-		public void OnCollide()
+		public void OnCollide(ICollidable collider)
 		{
 			Remove();
+			player.AddPoints(collider);
 		}
 
 		public void Update()
@@ -54,6 +55,11 @@ namespace Asteroids
 		{
 			CollisionManager.collidables.Remove(this);
 			bullets.Remove(this);
+		}
+
+		public void SetPlayer(Player player)
+		{
+			this.player = player;
 		}
 
 		public static void UpdateBullets()

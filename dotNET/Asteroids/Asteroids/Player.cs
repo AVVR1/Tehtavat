@@ -12,22 +12,23 @@ namespace Asteroids
 {
     class Player : Movable, ICollidable
     {
-		public bool isAlive = true;
-        bool engineOn = false;
-        bool hit = false;
-        public bool drawTexture = true;
-
         Vector2 velocity = Vector2.Zero;
         Vector2 acceleration = Vector2.Zero;
+		public bool isAlive = true;
+        public bool drawTexture = true;
+        bool engineOn = false;
+        bool hit = false;
 
         //variables
+        Vector2 spawnPosition = new Vector2(400, 300);
         float maxSpeed = 300f;
         float enginePower = 200f;
 		public int lives = 3;
-        Vector2 spawnPosition = new Vector2(400, 300);
-
-        float timer = 0f;
         float invincibilityTime = 3f;
+
+        //counters
+        public float points = 0;
+        float timer = 0f;
 
         public object hitbox { get; set; } = new Vector2(30, 70);
 		public ColliderType colliderType { get; set; } = ColliderType.Rectangle;
@@ -72,7 +73,8 @@ namespace Asteroids
             }
             if (Raylib.IsKeyPressed(KeyboardKey.Space))
             {
-                new Bullet(position + direction * 50, direction, rotation);
+                Bullet bullet = new Bullet(position + direction * 50, direction, rotation);
+                bullet.SetPlayer(this);
             }
         }
 
@@ -96,10 +98,11 @@ namespace Asteroids
 			position += velocity * deltaTime;
 		}
 
-		public void OnCollide()
+		public void OnCollide(ICollidable collider)
 		{
-            Console.WriteLine("HIT");
+			Console.WriteLine("HIT");
 			lives--;
+            AddPoints(collider);
             Respawn();
             if (lives <= 0)
 			{
@@ -128,5 +131,25 @@ namespace Asteroids
             velocity = Vector2.Zero;
             rotation = 0;
         }
+
+        public void AddPoints(ICollidable collider)
+        {
+			if (collider.GetType() == typeof(Asteroid))
+			{
+                Asteroid asteroid = (Asteroid)collider;
+				switch (asteroid.asteroidSize)
+				{
+					case Asteroid.AsteroidSize.Big:
+					points += 20;
+					break;
+					case Asteroid.AsteroidSize.Medium:
+					points += 50;
+					break;
+					case Asteroid.AsteroidSize.Small:
+					points += 100;
+					break;
+				}
+			}
+		}
 	}
 }

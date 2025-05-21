@@ -57,9 +57,10 @@ namespace Asteroids
 
 			Bullet.DrawBullets();
 			AsteroidManager.DrawAsteroids();
+			Raylib.DrawText($"Points: {player.points}", 10, 5, 20, Color.White);
+			Raylib.DrawText($"Lives: ", 10, 30, 20, Color.White); Raylib.DrawText($"{player.lives}", 70, 30, 20, Color.Red);
 			if (player.isAlive)
 			{
-				Raylib.DrawText($"Lives: {player.lives}", 10, 5, 20, Color.White);
 				if (player.drawTexture)
 				{
 					player.Draw();

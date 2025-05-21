@@ -16,15 +16,15 @@ namespace Asteroids
 	{
 		public enum AsteroidSize { Big, Medium, Small}
 
-		float speed;
-		AsteroidSize asteroidSize;
-
-		public object hitbox { get; set; } = 40f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
+		public AsteroidSize asteroidSize;
+		public object hitbox { get; set; } = 40f;
+
+		float speed;
 
 		Random random = new Random();
 
-		public void OnCollide()
+		public void OnCollide(ICollidable collider)
 		{
 			Vector2 dir = Class1.GetRandomDirection();
 			float distance = random.NextSingle();
