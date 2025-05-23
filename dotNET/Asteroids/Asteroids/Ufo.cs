@@ -17,7 +17,11 @@ namespace Asteroids
 		public static Texture2D ufoTexture;
 		public object hitbox { get; set; } = 50f;
 		float speed = 50f;
+
+		//timers
 		static float timer = 0f;
+		float shootCooldown = 3f;
+		float dirCooldown = 2.5f;
 
 		// Spawn area
 		static float spawnProtectionRadius = 200f;
@@ -44,13 +48,25 @@ namespace Asteroids
 		public void Update()
 		{
 			position += direction * speed * Raylib.GetFrameTime();
-			if (timer % 2.5f < 0.01f)
+			
+			if (dirCooldown > 0f)
+			{
+				dirCooldown -= Raylib.GetFrameTime();
+			}
+			else if (timer % 2.5f < 0.1f)
 			{
 				direction = Class1.GetRandomDirection();
+                Console.WriteLine("direction");
+				dirCooldown = 2.5f;
 			}
-			if (timer% 3f < 0.01f)
+			if (shootCooldown > 0f)
 			{
-				Shoot();
+				shootCooldown -= Raylib.GetFrameTime();
+			}
+			else if (timer % 3f < 0.1f)
+			{
+				Console.WriteLine("Shoot");
+				shootCooldown = 3f;
 			}
 		}
 
