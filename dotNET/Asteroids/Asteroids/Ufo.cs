@@ -12,16 +12,23 @@ namespace Asteroids
 {
 	internal class Ufo : Movable, ICollidable
 	{
-		public static List<Ufo> ufos = new List<Ufo>();
+		public static List<Ufo> ufoList = new List<Ufo>();
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
 		public static Texture2D ufoTexture;
-		public object hitbox { get; set; } = 50f;
-		float speed = 50f;
+		public object hitbox { get; set; } = 30f;
+		float speed = 75f;
+
+		//cooldowns
+		static float shootCooldown = 3f;
+		static float dirCooldown = 1.5f;
+
+		static float spawnCooldown = 5f;
 
 		//timers
-		static float timer = 0f;
-		float shootCooldown = 3f;
-		float dirCooldown = 2.5f;
+		float shootTimer = shootCooldown;
+		float dirTimer = dirCooldown;
+
+		public static float spawnTimer = spawnCooldown;
 
 		// Spawn area
 		static float spawnProtectionRadius = 200f;
@@ -29,63 +36,67 @@ namespace Asteroids
 
 		public static void InitTexture()
 		{
-			ufoTexture = Raylib.LoadTexture("Images/ufo.png");
+			ufoTexture = Raylib.LoadTexture("Images/ufoRed.png");
 		}
 		public Ufo(Vector2 position, Vector2 direction, float rotation)
 		{
 			this.position = position;
 			this.direction = direction;
 			texture = ufoTexture;
-			ufos.Add(this);
+			ufoList.Add(this);
 			CollisionManager.collidables.Add(this);
 		}
 		public void OnCollide(ICollidable collider)
 		{
-			ufos.Remove(this);
+			ufoList.Remove(this);
 			CollisionManager.collidables.Remove(this);
 		}
 
 		public void Update()
 		{
+			float deltaTime = Raylib.GetFrameTime();
+
 			position += direction * speed * Raylib.GetFrameTime();
-			
-			if (dirCooldown > 0f)
+
+			shootTimer -= deltaTime;
+			dirTimer -= deltaTime;
+
+			if (shootTimer <= 0)
 			{
-				dirCooldown -= Raylib.GetFrameTime();
+				shootTimer = shootCooldown;
+				Shoot();
 			}
-			else if (timer % 2.5f < 0.1f)
+			if (dirTimer <= 0)
 			{
-				direction = Class1.GetRandomDirection();
-                Console.WriteLine("direction");
-				dirCooldown = 2.5f;
-			}
-			if (shootCooldown > 0f)
-			{
-				shootCooldown -= Raylib.GetFrameTime();
-			}
-			else if (timer % 3f < 0.1f)
-			{
-				Console.WriteLine("Shoot");
-				shootCooldown = 3f;
+				dirTimer = dirCooldown;
+				ChangeDirection();
 			}
 		}
 
 		public static void UpdateUfos()
 		{
-			foreach (Ufo ufo in ufos)
+			for (int i = ufoList.Count - 1; i >= 0; i--)
 			{
-				ufo.Update();
+				ufoList[i].Update();
 			}
 		}
 
-		public static void UfoTimer(Vector2 playerPos)
+		public static void DrawUfos()
 		{
-			timer += Raylib.GetFrameTime();
-			if (timer % 30f < 0.01f)
+			for (int i = ufoList.Count - 1; i >= 0; i--)
 			{
+				ufoList[i].Draw();
+			}
+		}
+
+		public static void SpawnTimer(Vector2 playerPos)
+		{
+			spawnTimer -= Raylib.GetFrameTime();
+			if (spawnTimer <= 0)
+			{
+				spawnTimer = spawnCooldown;
 				new Ufo(GetSpawnPosition(playerPos), Class1.GetRandomDirection(), 0);
 			}
-
 		}
 		static Vector2 GetSpawnPosition(Vector2 playerPos)
 		{
@@ -96,9 +107,16 @@ namespace Asteroids
 
 		void Shoot()
 		{
+			//fix ufos shooting themself
 			float randAngle = Class1.GetRandomAngle();
 			Vector2 randDir = new Vector2(MathF.Cos(randAngle), MathF.Sin(randAngle));
-			new Bullet(position, randDir, randAngle);
+			new Bullet(position + (randDir * ((float)hitbox + 15f)), randDir, randAngle * Raylib.RAD2DEG + 90, 250f);
+			Console.WriteLine("SHOOT");
+		}
+
+		void ChangeDirection()
+		{
+			direction = Class1.GetRandomDirection();
 		}
 	}
 }

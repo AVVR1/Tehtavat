@@ -13,18 +13,20 @@ namespace Asteroids
 		public static List<Bullet> bullets = new List<Bullet>();
 		public static Texture2D bulletTexture;
 		public object hitbox { get; set; } = 10f;
+		float speed = 500f;
 		public ColliderType colliderType { get; set; } = ColliderType.Circle;
-		Player player;
+		static Player? player;
 
 		float timer = 0f;
 		float maxLifetime = 1f;
 
-		public Bullet(Vector2 position, Vector2 direction, float rotation)
+		public Bullet(Vector2 position, Vector2 direction, float rotation, float speed)
 		{
 			texture = bulletTexture;
 			this.position = position;
 			this.direction = direction;
 			this.rotation = rotation;
+			this.speed = speed;
 			CollisionManager.collidables.Add(this);
 			bullets.Add(this);
 		}
@@ -43,7 +45,7 @@ namespace Asteroids
 		public void Update()
 		{
 			timer += Raylib.GetFrameTime();
-			position += direction * 500 * Raylib.GetFrameTime();
+			position += direction * speed * Raylib.GetFrameTime();
 			WarpToScreen();
 			if (timer >= maxLifetime)
 			{
@@ -57,9 +59,9 @@ namespace Asteroids
 			bullets.Remove(this);
 		}
 
-		public void SetPlayer(Player player)
+		public static void SetPlayer(Player player)
 		{
-			this.player = player;
+			Bullet.player = player;
 		}
 
 		public static void UpdateBullets()

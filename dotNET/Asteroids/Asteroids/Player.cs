@@ -37,6 +37,7 @@ namespace Asteroids
         {
 			position = spawnPosition;
 			direction = new Vector2(0, 1);
+			Bullet.SetPlayer(this);
 			CollisionManager.collidables.Add(this);
 		}
 		public void Update()
@@ -73,8 +74,7 @@ namespace Asteroids
             }
             if (Raylib.IsKeyPressed(KeyboardKey.Space))
             {
-                Bullet bullet = new Bullet(position + direction * 50, direction, rotation);
-                bullet.SetPlayer(this);
+                Bullet bullet = new Bullet(position + direction * 50, direction, rotation, 500f);
             }
         }
 

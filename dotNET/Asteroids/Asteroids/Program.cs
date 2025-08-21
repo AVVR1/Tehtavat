@@ -26,6 +26,7 @@ namespace Asteroids
 		{
 			AsteroidManager.InitTextures();
 			Bullet.InitTexture();
+			Ufo.InitTexture();
 			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
         }
 
@@ -46,9 +47,9 @@ namespace Asteroids
 			player.Update();
 			AsteroidManager.UpdateAsteroids();
 			Bullet.UpdateBullets();
-			Ufo.UpdateUfos();
+			Ufo.UpdateUfos();		
+			Ufo.SpawnTimer(player.position);
 			CollisionManager.CheckCollisions();
-			Ufo.UfoTimer(player.position);
 			AsteroidManager.CheckForNextWave(player.position);
         }
 
@@ -58,6 +59,7 @@ namespace Asteroids
 			Raylib.BeginDrawing();
 
 			Bullet.DrawBullets();
+			Ufo.DrawUfos();
 			AsteroidManager.DrawAsteroids();
 			Raylib.DrawText($"Points: {player.points}", 10, 5, 20, Color.White);
 			Raylib.DrawText($"Lives: ", 10, 30, 20, Color.White); Raylib.DrawText($"{player.lives}", 70, 30, 20, Color.Red);
