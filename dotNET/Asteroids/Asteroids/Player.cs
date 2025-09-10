@@ -18,6 +18,7 @@ namespace Asteroids
         public bool drawTexture = true;
         bool engineOn = false;
         bool hit = false;
+        bool startRestartTimer = false;
 
         //variables
         Vector2 spawnPosition = new Vector2(400, 300);
@@ -29,6 +30,7 @@ namespace Asteroids
         //counters
         public float points = 0;
         float timer = 0f;
+        float restartTimer = 5f;
 
 		public ColliderType colliderType { get; set; } = ColliderType.Rectangle;
         public object hitbox { get; set; } = new Vector2(30, 70);
@@ -107,6 +109,7 @@ namespace Asteroids
             if (lives <= 0)
 			{
                 isAlive = false;
+                StartRestartTimer();
             }
         }
 
@@ -121,6 +124,24 @@ namespace Asteroids
                 timer = 0f;
                 CollisionManager.collidables.Add(this);
             }
+        }
+
+        void StartRestartTimer()
+        {
+            startRestartTimer = true;
+        }
+
+        public bool RestartTimer()
+        {
+            if (startRestartTimer)
+            {
+                restartTimer -= Raylib.GetFrameTime();
+                if (restartTimer <= 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         void Respawn()

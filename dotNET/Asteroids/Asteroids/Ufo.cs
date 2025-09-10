@@ -22,7 +22,7 @@ namespace Asteroids
 		static float shootCooldown = 3f;
 		static float dirCooldown = 1.5f;
 
-		static float spawnCooldown = 5f;
+		static float spawnCooldown = 30f;
 
 		//timers
 		float shootTimer = shootCooldown;

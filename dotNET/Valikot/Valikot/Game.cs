@@ -1,26 +1,28 @@
-﻿using ClassLibrary1;
-using Raylib_cs;
+﻿using Raylib_cs;
+using System;
+using System.Collections.Generic;
+//using System.Drawing;
+using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 using RayGuiCreator;
+using System.Collections.Concurrent;
+using ZeroElectric.Vinculum.Extensions;
 
-namespace Asteroids
+namespace Valikot
 {
-	internal class Program
+	internal class Game
 	{
-        static void Main(string[] args)
-		{
-			Program game = new Program();
-			game.Init();
-		}
 
 		PauseMenu? myPauseMenu;
 		OptionsMenu? myOptionsMenu;
-
 		public enum GameState { GameLoop, MainMenu, PauseMenu, OptionsMenu };
 
-		GameState state;
+		Stack<GameState> stateStack = new Stack<GameState>();
 
-		private Stack<GameState> stateStack = new Stack<GameState>();
+		GameState state;
 
 		Vector2 direction = new Vector2(1, -1);
 
@@ -28,121 +30,109 @@ namespace Asteroids
 
 		float speedIncrease = 5f;
 
-		Color color = Color.Black;
+		Color color = Color.Yellow;
+		
 
-		Player player;
+		Vector2 textSize = Raylib.MeasureTextEx(Raylib.GetFontDefault(), "DVD", 20, 1);
 
-        void Init()
+		Vector2 pos;
+
+		int screenWidth = 1080;
+		int screenHeight = 720;
+
+		public void Init()
 		{
-			Raylib.InitWindow(800, 600, "ASTEROIDS");
+			Raylib.InitWindow(screenWidth, screenHeight, "VALIKOT");
+
 			Raylib.SetExitKey(KeyboardKey.Null);
 
 			state = GameState.MainMenu;
 			stateStack.Push(GameState.MainMenu);
 
+			pos = new Vector2(screenWidth / 2 - textSize.X / 2, screenHeight / 2 - textSize.Y / 2);
+
 			myOptionsMenu = new OptionsMenu();
 			myPauseMenu = new PauseMenu();
-
-			player = new Player();
 
 			myOptionsMenu.BackButtonPressedEvent += OnStateReturn;
 			myOptionsMenu.StateButtonPressedEvent += OnStateChange;
 			myPauseMenu.BackButtonPressedEvent += OnStateReturn;
 			myPauseMenu.StateButtonPressedEvent += OnStateChange;
-			Start();
-			//kaikki ladattu --> Gameloop
-			GameLoop();
 		}
-
-		void Start()
-		{
-			AsteroidManager.InitTextures();
-			Bullet.InitTexture();
-			Ufo.InitTexture();
-			player.texture = Raylib.LoadTexture("Images/playerShip2_blue.png");
-        }
-
-		void GameLoop()
+		public void GameLoop()
 		{
 			while (!Raylib.WindowShouldClose())
 			{
-				switch (state)
+				switch(state)
 				{
 					case GameState.OptionsMenu:
-					myOptionsMenu?.DrawMenu();
-					break;
+						myOptionsMenu?.DrawMenu();
+						break;
 
 					case GameState.PauseMenu:
-					myPauseMenu?.DrawMenu();
-					break;
+						myPauseMenu?.DrawMenu();
+						break;
 
 					case GameState.MainMenu:
-					DrawMainMenu();
-					break;
+						DrawMainMenu();
+						break;
 
 					case GameState.GameLoop:
-					Update();
-					Draw();
-					break;
+						UpdateGame();
+						DrawGame();
+						break;
 				}
 			}
-			Raylib.UnloadTexture(player.texture);
-			AsteroidManager.UnloadTextures();
 			Raylib.CloseWindow();
 		}
-
-		void Update()
+		private void UpdateGame()
 		{
-			player.Update();
-			AsteroidManager.UpdateAsteroids();
-			Bullet.UpdateBullets();
-			Ufo.UpdateUfos();		
-			Ufo.SpawnTimer(player.position);
-			CollisionManager.CheckCollisions();
-			AsteroidManager.CheckForNextWave(player.position);
+			#region ehdot
+			if (pos.X + textSize.X > screenWidth)
+			{
+				pos.X = screenWidth - textSize.X;
+				direction.X = -direction.X;
+				Collision();
+			}
+			if (pos.X < 0)
+			{
+				pos.X = 0;
+				direction.X = -direction.X;
+				Collision();
+			}
+			if (pos.Y + textSize.Y > screenHeight)
+			{
+				pos.Y = screenHeight - textSize.Y;
+				direction.Y = -direction.Y;
+				Collision();
+			}
+			if (pos.Y < 0)
+			{
+				pos.Y = 0;
+				direction.Y = -direction.Y;
+				Collision();
+			}
+			#endregion
+			pos += direction * speed * Raylib.GetFrameTime();
+			MenuCreator gameMenu = new MenuCreator(50, 50, 20, 200);
 
 			if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 			{
 				ChangeState(GameState.PauseMenu);
 			}
 
-			if (player.RestartTimer())
-			{
-				ResetData();
-				Program game = new Program();
-				game.Init();
-			}
 		}
-
-		void Draw()
+		private void DrawGame()
 		{
 			Raylib.ClearBackground(Color.Black);
 			Raylib.BeginDrawing();
-
-			Bullet.DrawBullets();
-			Ufo.DrawUfos();
-			AsteroidManager.DrawAsteroids();
-			Raylib.DrawText($"Points: {player.points}", 10, 5, 20, Color.White);
-			Raylib.DrawText($"Lives: ", 10, 30, 20, Color.White); Raylib.DrawText($"{player.lives}", 70, 30, 20, Color.Red);
-			if (player.isAlive)
-			{
-				if (player.drawTexture)
-				{
-					player.Draw();
-				}
-			}
-			else
-            {
-                Raylib.DrawText("GAME OVER", 250, 275, 50, Color.Red);
-            }
-
+			Raylib.DrawText("DVD", ((int)pos.X), ((int)pos.Y), 20, color);
 			Raylib.EndDrawing();
-        }
-
+		}
 		private void DrawMainMenu()
 		{
 			Raylib.BeginDrawing();
-			Raylib.ClearBackground(color);
+			Raylib.ClearBackground(Color.Gold);
 			MenuCreator mainMenu = new MenuCreator(50, 50, 20, 200);
 			mainMenu.Label("Main Menu");
 			mainMenu.Label("Instructions");
@@ -157,7 +147,6 @@ namespace Asteroids
 			if (mainMenu.Button("Exit"))
 			{
 				Raylib.CloseWindow();
-				return;
 			}
 			Raylib.EndDrawing();
 		}
@@ -174,7 +163,7 @@ namespace Asteroids
 			switch (nextState)
 			{
 				case GameState.GameLoop:
-
+					
 				break;
 
 				case GameState.PauseMenu:
@@ -201,14 +190,10 @@ namespace Asteroids
 			}
 			state = stateStack.Peek();
 		}
-
-		private void ResetData()
+		private void Collision()
 		{
-			AsteroidManager.difficulty = 0;
-			CollisionManager.collidables.Clear();
-			AsteroidManager.asteroids.Clear();
-			Ufo.ufoList.Clear();
-			Bullet.bullets.Clear();
+			speed += speedIncrease;
+			color = Raylib.ColorFromHSV(Raylib.GetRandomValue(0, 360), 1, 1);
 		}
 	}
 }

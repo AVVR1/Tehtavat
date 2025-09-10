@@ -22,7 +22,7 @@ namespace Asteroids
 		static float minSpeed = 50f;
 		static float maxSpeed = 75f;
 
-		static int difficulty = 0;
+		public static int difficulty = 0;
 
 		public static void InitTextures()
 		{
