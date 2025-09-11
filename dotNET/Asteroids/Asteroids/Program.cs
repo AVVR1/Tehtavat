@@ -22,15 +22,9 @@ namespace Asteroids
 
 		private Stack<GameState> stateStack = new Stack<GameState>();
 
-		Vector2 direction = new Vector2(1, -1);
-
-		float speed = 100.0f;
-
-		float speedIncrease = 5f;
-
 		Color color = Color.Black;
 
-		Player player;
+		Player? player;
 
         void Init()
 		{
