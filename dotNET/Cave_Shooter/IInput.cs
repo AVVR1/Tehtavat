@@ -8,14 +8,14 @@ namespace Cave_Shooter
 {
 	internal interface IInput
 	{
-		object shootKey { get; }
+		object ShootInput { get; }
 
-		object shootSpecialKey { get; }
+		object ShootSpecialInput { get; }
 
-		object thrustKey { get; }
+		object ThrustInput { get; }
 
-		object turnRightKey { get; }
+		object TurnRightInput { get; }
 
-		object turnLeftKey { get; }
+		object TurnLeftInput { get; }
 	}
 }

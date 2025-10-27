@@ -9,15 +9,15 @@ namespace Cave_Shooter
 {
 	internal class Keyboard : IInput
 	{
-		public object shootKey => KeyboardKey.S;
+		public object ShootInput { get; } = KeyboardKey.S;
 
-		public object shootSpecialKey => throw new NotImplementedException();
+		public object ShootSpecialInput { get; } = KeyboardKey.E;
 
-		public object thrustKey => throw new NotImplementedException();
+		public object ThrustInput { get; } = KeyboardKey.W;
 
-		public object turnRightKey => throw new NotImplementedException();
+		public object TurnLeftInput { get; } = KeyboardKey.A;
 
-		public object turnLeftKey => throw new NotImplementedException();
+		public object TurnRightInput { get; } = KeyboardKey.D;
 
 	}
 }

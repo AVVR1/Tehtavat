@@ -5,16 +5,16 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
-	internal class Player : Damageable, IHealth, IPlayerInput
+	internal class Player : Damageable, IHealth
 	{
 		private const float MAX_HEALTH = 100;
 
-		public KeyboardKey shootKey { get; private set; }
-
 		private Weapon weapon;
+		private IInput inputDevice;
 		public static Texture2D texture;
 		private Vector2 position;
 		private float rotation;
@@ -26,11 +26,14 @@ namespace Cave_Shooter
 		Vector2 direction;
 		Vector2 velocity;
 
-		public Player(Weapon weapon) // Initialize player
+		public Player(Weapon weapon, IInput inputDevice) // Initialize player
 		{
 			this.weapon = weapon;
+			this.inputDevice = inputDevice;
 			maxHealth = MAX_HEALTH;
 			health = MAX_HEALTH;
+			//
+
 			//Create player camera
 		}
 
@@ -41,7 +44,22 @@ namespace Cave_Shooter
 
 		private void Shoot()
 		{
-			//Shoot logic
+			Console.WriteLine("Shoot");
+		}
+
+		private void ShootSpecial()
+		{
+			Console.WriteLine("ShootSpecial");
+		}
+
+		private void Thrust()
+		{
+			Console.WriteLine("Thrust");
+		}
+
+		private void Turn(float amount)
+		{
+			Console.WriteLine($"Turn {amount}");
 		}
 
 		public void OnDeath()
@@ -72,38 +90,40 @@ namespace Cave_Shooter
 
 		public void Update()
 		{
-			Console.WriteLine("UPDATE");
 			CalculatePhysics();
+			Input();
+		}
+
+		private void Input()
+		{
+			object input = Raylib.GetKeyPressed();
+			Console.WriteLine(input);
+			//TODO: run input functionality if Input matches inputdevice button
+			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootInput))
+			{
+				Shoot();
+			}
+			else if (input == inputDevice.ShootSpecialInput)
+			{
+				ShootSpecial();
+			}
+			else if (input == inputDevice.ThrustInput)
+			{
+				Thrust();
+			}
+			else if (input == inputDevice.TurnRightInput)
+			{
+				Turn(1);
+			}
+			else if (input == inputDevice.TurnLeftInput)
+			{
+				Turn(-1);
+			}
 		}
 
 		public void Draw()
 		{
 			Raylib.DrawTexture(texture,(int)position.X,(int)position.Y,Color.White);
-		}
-
-		void IPlayerInput.Thrust()
-		{
-			throw new NotImplementedException();
-		}
-
-		void IPlayerInput.TurnRight()
-		{
-			throw new NotImplementedException();
-		}
-
-		void IPlayerInput.TurnLeft()
-		{
-			throw new NotImplementedException();
-		}
-
-		void IPlayerInput.Shoot()
-		{
-			Shoot();
-		}
-
-		void IPlayerInput.ShootSpecial()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

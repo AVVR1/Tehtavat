@@ -24,8 +24,8 @@ namespace Cave_Shooter
 			players = new List<Player>();
 			for (int i = 0; i < playerCount; i++)
 			{
-				//TODO: add selected weapon
-				players.Add(new Player(new Weapon()));
+				//TODO: add selected weapon and Input device;
+				players.Add(new Player(new Weapon(), new Keyboard()));
 			}
 		}
 
