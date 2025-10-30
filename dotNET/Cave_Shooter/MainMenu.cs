@@ -9,7 +9,7 @@ namespace Cave_Shooter
 {
 	internal class MainMenu
 	{
-		public event EventHandler? BackButtonPressedEvent;
+		//public event EventHandler? BackButtonPressedEvent;
 		public event EventHandler<GameState>? StateButtonPressedEvent;
 		internal void DrawMenu()
 		{

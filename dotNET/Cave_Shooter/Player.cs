@@ -11,17 +11,19 @@ namespace Cave_Shooter
 {
 	internal class Player : Damageable, IHealth
 	{
-		private const float MAX_HEALTH = 100;
+		private const float GRAVITY = -9.81f;
+		private const float MAX_HEALTH = 100f;
+		private const float ENGINE_POWER = 200f;
 
 		private Weapon weapon;
 		private IInput inputDevice;
 		public static Texture2D texture;
-		private Vector2 position;
-		private float rotation;
+		private Vector2 position = new Vector2(50, 50);
+		private float rotation = 0f;
 
 		//physics variables
-		float engineThrust;
-		float maxSpeed;
+		float engineThrust = 0f;
+		float maxSpeed = 300f;
 		Vector2 acceleration;
 		Vector2 direction;
 		Vector2 velocity;
@@ -32,14 +34,14 @@ namespace Cave_Shooter
 			this.inputDevice = inputDevice;
 			maxHealth = MAX_HEALTH;
 			health = MAX_HEALTH;
-			//
-
 			//Create player camera
 		}
 
 		public static void InitTexture()
 		{
+			Console.WriteLine("Texture");
 			texture = Raylib.LoadTexture("Images/Drawf.png");
+			Raylib.SetTextureFilter(texture, TextureFilter.Bilinear);
 		}
 
 		private void Shoot()
@@ -54,7 +56,7 @@ namespace Cave_Shooter
 
 		private void Thrust()
 		{
-			Console.WriteLine("Thrust");
+			engineThrust = ENGINE_POWER;
 		}
 
 		private void Turn(float amount)
@@ -71,13 +73,20 @@ namespace Cave_Shooter
 		{
 			Console.WriteLine("Player got hurt");
 		}
+
+		public void Update()
+		{
+			CalculatePhysics();
+			Input();
+		}
+
 		private void CalculatePhysics()
 		{
 			float deltaTime = Raylib.GetFrameTime();
 			acceleration = Vector2.Zero;
 			direction = Vector2.Transform(-Vector2.UnitY, Matrix3x2.CreateRotation(rotation * Raylib.DEG2RAD));
 
-			acceleration += direction * engineThrust;
+			acceleration += direction * (engineThrust + GRAVITY);
 
 			velocity += acceleration * deltaTime;
 
@@ -86,36 +95,31 @@ namespace Cave_Shooter
 				velocity = Vector2.Normalize(velocity) * maxSpeed;
 			}
 			position += velocity * deltaTime;
-		}
 
-		public void Update()
-		{
-			CalculatePhysics();
-			Input();
+			//Set engine thrust back to 0 to deactivate when not pressing thrust key.
+			engineThrust = 0f;
 		}
 
 		private void Input()
 		{
-			object input = Raylib.GetKeyPressed();
-			Console.WriteLine(input);
 			//TODO: run input functionality if Input matches inputdevice button
 			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootInput))
 			{
 				Shoot();
 			}
-			else if (input == inputDevice.ShootSpecialInput)
+			else if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootSpecialInput))
 			{
 				ShootSpecial();
 			}
-			else if (input == inputDevice.ThrustInput)
+			else if (Raylib.IsKeyDown((KeyboardKey)inputDevice.ThrustInput))
 			{
 				Thrust();
 			}
-			else if (input == inputDevice.TurnRightInput)
+			else if (Raylib.IsKeyDown((KeyboardKey)inputDevice.TurnRightInput))
 			{
 				Turn(1);
 			}
-			else if (input == inputDevice.TurnLeftInput)
+			else if (Raylib.IsKeyDown((KeyboardKey)inputDevice.TurnLeftInput))
 			{
 				Turn(-1);
 			}

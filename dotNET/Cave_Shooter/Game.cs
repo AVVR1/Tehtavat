@@ -9,6 +9,12 @@ namespace Cave_Shooter
 {
 	internal class Game
 	{
+		private Keybinds[] playerKeybinds =
+		[
+			new Keybinds(KeyboardKey.W, KeyboardKey.S, KeyboardKey.E, KeyboardKey.A, KeyboardKey.D),
+			new Keybinds(KeyboardKey.Up, KeyboardKey.Down, KeyboardKey.PageDown, KeyboardKey.Left, KeyboardKey.Right)
+		];
+
 		private int playerCount;
 		private List<Player> players;
 
@@ -25,7 +31,7 @@ namespace Cave_Shooter
 			for (int i = 0; i < playerCount; i++)
 			{
 				//TODO: add selected weapon and Input device;
-				players.Add(new Player(new Weapon(), new Keyboard()));
+				players.Add(new Player(new Weapon(), new Keyboard(playerKeybinds[i])));
 			}
 		}
 

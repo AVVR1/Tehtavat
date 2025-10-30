@@ -29,6 +29,7 @@ namespace Cave_Shooter
 		private void Init()
 		{
 			Raylib.InitWindow(SCREENWIDTH, SCREENHEIGHT, "Cave Shooter");
+			Raylib.SetTargetFPS(30);
 			//Raylib.ToggleFullscreen();
 
 			state = GameState.MainMenu;
