@@ -12,8 +12,10 @@ namespace Cave_Shooter
 	internal class Player : Damageable, IHealth
 	{
 		private const float GRAVITY = -9.81f;
+		private const float GRAVITY_MULT = 5f;
 		private const float MAX_HEALTH = 100f;
 		private const float ENGINE_POWER = 200f;
+		private const float TURN_POWER = 300f;
 
 		private Weapon weapon;
 		private IInput inputDevice;
@@ -61,7 +63,8 @@ namespace Cave_Shooter
 
 		private void Turn(float amount)
 		{
-			Console.WriteLine($"Turn {amount}");
+			rotation += amount * TURN_POWER * Raylib.GetFrameTime();
+			rotation %= 360;
 		}
 
 		public void OnDeath()
@@ -86,11 +89,12 @@ namespace Cave_Shooter
 			acceleration = Vector2.Zero;
 			direction = Vector2.Transform(-Vector2.UnitY, Matrix3x2.CreateRotation(rotation * Raylib.DEG2RAD));
 
-			acceleration += direction * (engineThrust + GRAVITY);
+			acceleration += direction * engineThrust;
+			acceleration += -Vector2.UnitY * GRAVITY * GRAVITY_MULT;
 
 			velocity += acceleration * deltaTime;
 
-			if (velocity.Length() >= maxSpeed)
+			if (velocity.Length() > maxSpeed)
 			{
 				velocity = Vector2.Normalize(velocity) * maxSpeed;
 			}
@@ -107,15 +111,15 @@ namespace Cave_Shooter
 			{
 				Shoot();
 			}
-			else if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootSpecialInput))
+			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootSpecialInput))
 			{
 				ShootSpecial();
 			}
-			else if (Raylib.IsKeyDown((KeyboardKey)inputDevice.ThrustInput))
+			if (Raylib.IsKeyDown((KeyboardKey)inputDevice.ThrustInput))
 			{
 				Thrust();
 			}
-			else if (Raylib.IsKeyDown((KeyboardKey)inputDevice.TurnRightInput))
+			if (Raylib.IsKeyDown((KeyboardKey)inputDevice.TurnRightInput))
 			{
 				Turn(1);
 			}
@@ -127,7 +131,15 @@ namespace Cave_Shooter
 
 		public void Draw()
 		{
-			Raylib.DrawTexture(texture,(int)position.X,(int)position.Y,Color.White);
+			Raylib.DrawTexturePro
+			(
+				texture,
+				new Rectangle(0, 0, texture.Width, texture.Height),
+				new Rectangle(position, new Vector2(texture.Width, texture.Height)),
+				new Vector2(texture.Width / 2, texture.Height / 2),
+				rotation,
+				Color.White
+			);
 		}
 	}
 }
