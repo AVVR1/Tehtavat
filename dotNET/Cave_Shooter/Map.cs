@@ -8,5 +8,6 @@ namespace Cave_Shooter
 {
 	internal class Map
 	{
+
 	}
 }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -17,26 +16,47 @@ namespace Cave_Shooter
 		private const float ENGINE_POWER = 200f;
 		private const float TURN_POWER = 300f;
 
-		private Weapon weapon;
-		private IInput inputDevice;
+
 		public static Texture2D texture;
-		private Vector2 position = new Vector2(50, 50);
-		private float rotation = 0f;
+		private Camera2D camera;
+
+		RenderTexture2D screenCamera = Raylib.LoadRenderTexture(500 / 2, 100);
+
+		private Vector2 position = new Vector2(200, 200);
+		private IInput inputDevice;
+		private Weapon weapon;
 
 		//physics variables
-		float engineThrust = 0f;
-		float maxSpeed = 300f;
-		Vector2 acceleration;
-		Vector2 direction;
-		Vector2 velocity;
+		private float engineThrust = 0f;
+		private float maxSpeed = 300f;
+		private float rotation = 0f;
+		private Vector2 acceleration;
+		private Vector2 direction;
+		private Vector2 velocity;
 
 		public Player(Weapon weapon, IInput inputDevice) // Initialize player
 		{
+			CalculateSplitscreen(16/9);
+			InitCamera();
 			this.weapon = weapon;
 			this.inputDevice = inputDevice;
 			maxHealth = MAX_HEALTH;
 			health = MAX_HEALTH;
 			//Create player camera
+		}
+
+		private void CalculateSplitscreen(float preferredRatio, int playerCount)
+		{
+			float targetAspect = Raylib.GetScreenWidth() / Raylib.GetScreenHeight() / preferredRatio;
+			int rows = (int)MathF.Round(MathF.Sqrt(playerCount / targetAspect));
+			int columns = (int)MathF.Ceiling(playerCount / rows);
+		}
+
+		private void InitCamera()
+		{
+			camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
+			camera.Zoom = 1;
+			camera.Rotation = 0;
 		}
 
 		public static void InitTexture()
@@ -79,8 +99,10 @@ namespace Cave_Shooter
 
 		public void Update()
 		{
+			camera.Target = position;
 			CalculatePhysics();
 			Input();
+			camera.Zoom = 1f;
 		}
 
 		private void CalculatePhysics()
@@ -102,6 +124,15 @@ namespace Cave_Shooter
 
 			//Set engine thrust back to 0 to deactivate when not pressing thrust key.
 			engineThrust = 0f;
+		}
+
+		public void Collision(Vector2 normal)
+		{
+			float dot = Vector2.Dot(velocity, normal);
+			if (dot < 0)
+			{
+				velocity -= dot * normal;
+			}
 		}
 
 		private void Input()
@@ -131,6 +162,7 @@ namespace Cave_Shooter
 
 		public void Draw()
 		{
+			Raylib.BeginMode2D(camera);
 			Raylib.DrawTexturePro
 			(
 				texture,
@@ -140,6 +172,7 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
+			Raylib.EndMode2D();
 		}
 	}
 }
