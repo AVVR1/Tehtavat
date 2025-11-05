@@ -36,7 +36,7 @@ namespace Cave_Shooter
 
 		public Player(Weapon weapon, IInput inputDevice) // Initialize player
 		{
-			CalculateSplitscreen(16/9);
+			CalculateSplitscreen(16/9, 2);
 			InitCamera();
 			this.weapon = weapon;
 			this.inputDevice = inputDevice;
@@ -61,7 +61,6 @@ namespace Cave_Shooter
 
 		public static void InitTexture()
 		{
-			Console.WriteLine("Texture");
 			texture = Raylib.LoadTexture("Images/Drawf.png");
 			Raylib.SetTextureFilter(texture, TextureFilter.Bilinear);
 		}
