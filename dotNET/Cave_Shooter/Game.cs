@@ -34,6 +34,8 @@ namespace Cave_Shooter
 			{
 				//TODO: add selected weapon and Input device;
 				players.Add(new Player(new Weapon(), new Keyboard(playerKeybinds[i])));
+				players[i].CalculateSplitscreenSize(16/9, playerCount, i); // Calculate split screen sizes
+				players[i].InitCamera();
 			}
 		}
 
@@ -63,7 +65,7 @@ namespace Cave_Shooter
 		{
 			foreach (Player p in players)
 			{
-				p.Draw();
+				p.Draw(players);
 			}
 		}
 

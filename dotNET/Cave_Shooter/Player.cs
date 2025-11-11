@@ -1,10 +1,13 @@
 ﻿using Raylib_cs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -20,41 +23,50 @@ namespace Cave_Shooter
 		public static Texture2D texture;
 		private Camera2D camera;
 
-		RenderTexture2D screenCamera = Raylib.LoadRenderTexture(500 / 2, 100);
+		public RenderTexture2D screenCamera;
+		private Rectangle splitScreenRect;
+		private Vector2 splitScreenPos;
 
+		// Transform
 		private Vector2 position = new Vector2(200, 200);
+		private float rotation = 0f;
+
 		private IInput inputDevice;
 		private Weapon weapon;
 
-		//physics variables
+		// Physics variables
 		private float engineThrust = 0f;
 		private float maxSpeed = 300f;
-		private float rotation = 0f;
 		private Vector2 acceleration;
 		private Vector2 direction;
 		private Vector2 velocity;
 
 		public Player(Weapon weapon, IInput inputDevice) // Initialize player
 		{
-			CalculateSplitscreen(16/9, 2);
-			InitCamera();
 			this.weapon = weapon;
 			this.inputDevice = inputDevice;
 			maxHealth = MAX_HEALTH;
 			health = MAX_HEALTH;
-			//Create player camera
 		}
-
-		private void CalculateSplitscreen(float preferredRatio, int playerCount)
+		public void CalculateSplitscreenSize(float preferredRatio, int playerCount, int playerIndex)
 		{
-			float targetAspect = Raylib.GetScreenWidth() / Raylib.GetScreenHeight() / preferredRatio;
+			int w = Raylib.GetScreenWidth();
+			int h = Raylib.GetScreenHeight();
+			float targetAspect = w / h / preferredRatio;
 			int rows = (int)MathF.Round(MathF.Sqrt(playerCount / targetAspect));
-			int columns = (int)MathF.Ceiling(playerCount / rows);
+			int columns = (int)MathF.Ceiling((float)playerCount / rows);
+			int splitScreenWidth = w / columns;
+			int splitScreenHeight = h / rows;
+			int splitScreenX = playerIndex % columns * splitScreenWidth;
+			int splitScreenY = (int)(MathF.Ceiling(playerIndex / columns) * splitScreenHeight);
+			splitScreenRect = new Rectangle(0, 0, splitScreenWidth, -splitScreenHeight);
+			splitScreenPos = new Vector2(splitScreenX, splitScreenY);
+			screenCamera = Raylib.LoadRenderTexture(splitScreenWidth, splitScreenHeight);
 		}
 
-		private void InitCamera()
+		public void InitCamera()
 		{
-			camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
+			camera.Offset = new Vector2(screenCamera.Texture.Width / 2, screenCamera.Texture.Height / 2);
 			camera.Zoom = 1;
 			camera.Rotation = 0;
 		}
@@ -159,9 +171,26 @@ namespace Cave_Shooter
 			}
 		}
 
-		public void Draw()
+		public void Draw(List<Player> players)
 		{
-			Raylib.BeginMode2D(camera);
+			Raylib.BeginTextureMode(screenCamera);
+			Raylib.BeginMode2D(camera); 
+			Raylib.ClearBackground(Color.Black);
+			//draw every player
+			foreach (Player p in players)
+			{
+				p.DrawPlayer();
+			}
+			//draw map
+			Raylib.DrawCircleV(Vector2.Zero, 100, Material.Terrain.Color);
+			
+			Raylib.EndMode2D();
+			Raylib.EndTextureMode();
+			Raylib.DrawTextureRec(screenCamera.Texture, splitScreenRect, splitScreenPos, Color.White);
+		}
+
+		public void DrawPlayer()
+		{
 			Raylib.DrawTexturePro
 			(
 				texture,
@@ -171,7 +200,6 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
-			Raylib.EndMode2D();
 		}
 	}
 }
