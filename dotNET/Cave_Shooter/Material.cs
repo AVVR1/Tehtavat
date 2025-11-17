@@ -16,7 +16,7 @@ namespace Cave_Shooter
 			Color = color;
 		}
 
-		public static readonly Material Empty = new Material(Color.Black);
+		public static readonly Material Empty = new Material(new Color(0,0,0,0));
 		public static readonly Material Terrain = new Material(Color.Green); 
 	}
 }

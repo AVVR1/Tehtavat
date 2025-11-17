@@ -7,6 +7,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -19,6 +20,11 @@ namespace Cave_Shooter
 		private const float TURN_POWER = 300f;
 
 		public static Texture2D texture;
+
+		// Camera
+		public Camera2D camera;
+		public RenderTexture2D screenCameraTexture;
+		public Rectangle splitScreenRect; // splitScreen position and Size.
 
 		// Transform
 		private Vector2 position = new Vector2(200, 200);
@@ -46,6 +52,30 @@ namespace Cave_Shooter
 		{
 			texture = Raylib.LoadTexture("Images/Drawf.png");
 			Raylib.SetTextureFilter(texture, TextureFilter.Bilinear);
+		}
+
+		public void InitCamera()
+		{
+			camera.Offset = new Vector2(screenCameraTexture.Texture.Width / 2, screenCameraTexture.Texture.Height / 2);
+			camera.Zoom = 1;
+			camera.Rotation = 0;
+		}
+
+		public void CalculateSplitscreenSize(float preferredRatio, int playerCount, int playerIndex)
+		{
+			int w = Raylib.GetScreenWidth();
+			int h = Raylib.GetScreenHeight();
+			float targetAspect = w / h / preferredRatio;
+			int rows = (int)MathF.Round(MathF.Sqrt(playerCount / targetAspect));
+			int columns = (int)MathF.Ceiling((float)playerCount / rows);
+			int splitScreenWidth = w / columns;
+			int splitScreenHeight = h / rows;
+			int splitScreenX = playerIndex % columns * splitScreenWidth;
+			int splitScreenY = (int)(MathF.Ceiling(playerIndex / columns) * splitScreenHeight);
+
+			// Set variables
+			screenCameraTexture = Raylib.LoadRenderTexture(splitScreenWidth, splitScreenHeight);
+			splitScreenRect = new Rectangle(splitScreenX, splitScreenY, splitScreenWidth, -splitScreenHeight);
 		}
 
 		private void Shoot()
@@ -79,11 +109,12 @@ namespace Cave_Shooter
 			Console.WriteLine("Player got hurt");
 		}
 
-		public void Update(Camera2D camera)
+		public void Update()
 		{
 			camera.Target = position;
 			CalculatePhysics();
 			Input();
+
 		}
 
 		private void CalculatePhysics()
@@ -103,22 +134,13 @@ namespace Cave_Shooter
 			}
 			position += velocity * deltaTime;
 
-			//Set engine thrust back to 0 to deactivate when not pressing thrust key.
+			// Set engine thrust back to 0 to deactivate when not pressing thrust key.
 			engineThrust = 0f;
-		}
-
-		public void Collision(Vector2 normal)
-		{
-			float dot = Vector2.Dot(velocity, normal);
-			if (dot < 0)
-			{
-				velocity -= dot * normal;
-			}
 		}
 
 		private void Input()
 		{
-			//TODO: run input functionality if Input matches inputdevice button
+			// TODO: run input functionality if Input matches inputdevice button
 			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootInput))
 			{
 				Shoot();
@@ -141,16 +163,19 @@ namespace Cave_Shooter
 			}
 		}
 
-		public void Draw(List<Player> players)
+		private void CalculateCollision()
 		{
-			Raylib.ClearBackground(Color.Black);
-			//draw every player
-			foreach (Player p in players)
+			// if player collides with terrain
+				//Get terrain normal
+				//Change player direction, prevent going through
+		}
+		public void Collision(Vector2 normal)
+		{
+			float dot = Vector2.Dot(velocity, normal);
+			if (dot < 0)
 			{
-				p.DrawPlayer();
+				velocity -= dot * normal;
 			}
-			//draw map
-			Raylib.DrawCircleV(Vector2.Zero, 100, Material.Terrain.Color);
 		}
 
 		public void DrawPlayer()
