@@ -69,6 +69,7 @@ namespace Cave_Shooter
 			foreach (Player player in players)
 			{
 				player.Update();
+				player.CheckCollision(map);
 			}
 		}
 

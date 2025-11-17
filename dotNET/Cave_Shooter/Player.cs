@@ -7,7 +7,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -163,11 +162,21 @@ namespace Cave_Shooter
 			}
 		}
 
-		private void CalculateCollision()
+		public void CheckCollision(Map map)
 		{
 			// if player collides with terrain
 				//Get terrain normal
 				//Change player direction, prevent going through
+			if (IsSameColor(map.GetImageColor(position), Material.Terrain.Color, 0))
+			{
+				CalculateTerrainNormal(position);
+				Console.WriteLine("Yes");
+			}
+		}
+
+		private void CalculateTerrainNormal(Vector2 position)
+		{
+
 		}
 		public void Collision(Vector2 normal)
 		{
@@ -189,6 +198,13 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
+		}
+
+		private bool IsSameColor(Color a, Color b, float threshold)
+		{
+			return (MathF.Abs(a.R - b.R) <= threshold)
+					&& (MathF.Abs(a.G - b.G) <= threshold)
+					&& (MathF.Abs(a.B - b.B) <= threshold);
 		}
 	}
 }
