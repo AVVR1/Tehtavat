@@ -7,6 +7,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -161,7 +162,7 @@ namespace Cave_Shooter
 				Turn(-1);
 			}
 		}
-
+		Vector2 testline;
 		public void CheckCollision(Map map)
 		{
 			// if player collides with terrain
@@ -169,17 +170,51 @@ namespace Cave_Shooter
 				//Change player direction, prevent going through
 			if (IsSameColor(map.GetImageColor(position), Material.Terrain.Color, 0))
 			{
-				CalculateTerrainNormal(position);
-				Console.WriteLine("Yes");
+				Vector2 normal = Vector2.Zero;
+				Vector2 n = CalculateTerrainNormal(position, map);
+				if (n != Vector2.Zero)
+				{
+					normal = n;
+				}
+				Collision(normal);
+				testline = normal;
 			}
 		}
 
-		private void CalculateTerrainNormal(Vector2 position)
+		private Vector2 CalculateTerrainNormal(Vector2 position, Map map)
 		{
+			int dx = 0;
+			int dy = 0;
 
+			for (int x = (int)position.X - 1; x <= (int)position.X + 1; x++)
+			{
+				for (int y = (int)position.Y - 1; y <= (int)position.Y + 1; y++)
+				{
+					bool isFilled = IsSameColor(map.GetImageColor(new Vector2(x, y)), Material.Terrain.Color, 0);
+
+					if (isFilled)
+					{
+						dx += x - (int)position.X;
+						dy += y - (int)position.Y;
+					}
+				}
+			}
+
+			Vector2 normal = new Vector2(-dx, -dy);
+
+			if (normal == Vector2.Zero)
+			{
+				return normal;
+			}
+			normal = Vector2.Normalize(normal);
+
+			return normal;
 		}
 		public void Collision(Vector2 normal)
 		{
+			Console.WriteLine(normal);
+			position += normal;
+
 			float dot = Vector2.Dot(velocity, normal);
 			if (dot < 0)
 			{
@@ -198,6 +233,8 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
+			Raylib.DrawLineV(position, position + testline * 10, Color.Red);
+
 		}
 
 		private bool IsSameColor(Color a, Color b, float threshold)
