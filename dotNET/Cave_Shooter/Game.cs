@@ -21,11 +21,14 @@ namespace Cave_Shooter
 		private int playerCount;
 		private List<Player> players;
 
+		public DebugView debugView;
+		
 		private Map map;
 
         public Game()
 		{
 			players = new List<Player>();
+			debugView = new DebugView();
 			map = new Map("Images/Map.png");
 		}
 
@@ -36,19 +39,22 @@ namespace Cave_Shooter
 			players = new List<Player>();
 			for (int i = 0; i < playerCount; i++)
 			{
-				//TODO: add selected weapon and Input device;
+				//TODO: add selected weapon
 				players.Add(new Player(new Weapon(), new Keyboard(playerKeybinds[i])));
-				players[i].CalculateSplitscreenSize(16/9, playerCount, i); // Calculate split screen sizes
+				players[i].CalculateSplitscreenSize(16/9, playerCount+1, i); // Calculate split screen sizes
 				players[i].InitCamera();
+				players[i].currentMap = map;
+
+				// add game for testing purposes
+				players[i].testGame = this;
 			}
-			//map.MapDrawCircle(new Vector2(map.texture.Width / 2, 0), 100, Material.Terrain.Color);
-			map.MapDrawRectangle(new Rectangle(200,200,100,100), Material.Terrain.Color);
+			// init debug camera
+			debugView.camera.Offset = new Vector2(debugView.screenCameraTexture.Texture.Width / 2, debugView.screenCameraTexture.Texture.Height / 2);
+			debugView.CalculateSplitscreenSize(16 / 9, playerCount+1, playerCount);
+
+			map.MapDrawRectangle(new Rectangle(-50,400,400,50), Material.Terrain.Color);
 			map.UpdateTexture();
 		}
-
-
-		
-
 
         public void Start()
 		{
@@ -69,7 +75,6 @@ namespace Cave_Shooter
 			foreach (Player player in players)
 			{
 				player.Update();
-				player.CheckCollision(map);
 			}
 		}
 
@@ -79,6 +84,8 @@ namespace Cave_Shooter
 			{
 				DrawScene(player);
             }
+			DrawDebug();
+			Raylib.DrawRectangleRec(debugView.splitScreenRect, Color.Blue);
 			DrawUI();
 		}
 
@@ -98,6 +105,19 @@ namespace Cave_Shooter
 			Raylib.EndTextureMode();
 
 			Raylib.DrawTextureRec(player.screenCameraTexture.Texture, new Rectangle(Vector2.Zero, player.splitScreenRect.Size), player.splitScreenRect.Position, Color.White);
+		}
+
+		private void DrawDebug()
+		{
+			Raylib.BeginTextureMode(debugView.screenCameraTexture);
+			Raylib.BeginMode2D(debugView.camera);
+			Raylib.ClearBackground(Color.Black);
+			map.Draw();
+			Raylib.EndMode2D();
+			Raylib.EndTextureMode();
+
+			Raylib.DrawTextureRec(debugView.screenCameraTexture.Texture, new Rectangle(Vector2.Zero, debugView.splitScreenRect.Size), debugView.splitScreenRect.Position, Color.White);
+			debugView.DrawDebugUI();
 		}
 
 		private void DrawUI()
