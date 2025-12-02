@@ -13,11 +13,17 @@ namespace Cave_Shooter
 {
 	internal class Player : Damageable, IHealth
 	{
+		// Constants
 		private const float GRAVITY = -9.81f;
 		private const float GRAVITY_MULT = 5f;
 		private const float MAX_HEALTH = 100f;
 		private const float ENGINE_POWER = 200f;
 		private const float TURN_POWER = 300f;
+
+		// Events
+		public event Action<Vector2, Vector2> OnShoot;
+		public event Action<Vector2, Vector2> OnShootSpecial;
+		public event Action OnThrust;
 
 		public static Texture2D texture;
 
@@ -39,6 +45,9 @@ namespace Cave_Shooter
 		private float engineThrust = 0f;
 		private float maxSpeed = 300f;
 		private Vector2 acceleration;
+		/// <summary>
+		/// direction of where the player sprite is facing
+		/// </summary>
 		private Vector2 direction;
 		private Vector2 velocity;
 
@@ -149,14 +158,17 @@ namespace Cave_Shooter
 			// TODO: run input functionality if Input matches inputdevice button
 			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootInput))
 			{
+				OnShoot?.Invoke(position, direction);
 				Shoot();
 			}
 			if (Raylib.IsKeyPressed((KeyboardKey)inputDevice.ShootSpecialInput))
 			{
+				OnShootSpecial?.Invoke(position, direction);
 				ShootSpecial();
 			}
 			if (Raylib.IsKeyDown((KeyboardKey)inputDevice.ThrustInput))
 			{
+				OnThrust?.Invoke();
 				Thrust();
 			}
 			if (Raylib.IsKeyDown((KeyboardKey)inputDevice.TurnRightInput))
@@ -174,7 +186,7 @@ namespace Cave_Shooter
 			// if player collides with terrain
 				//Get terrain normal
 				//Change player direction, prevent going through
-			if (IsSameColor(currentMap.GetImageColor(position), Material.Terrain.Color, 0))
+			if (Map.IsSameColor(currentMap.GetImageColor(position), Material.Terrain.Color, 0))
 			{
 				Vector2 bestPos = CollisionOffset(position, previousPos, previousPos, 0, 4);
 				Vector2 previousNormal = Vector2.Zero;
@@ -186,7 +198,7 @@ namespace Cave_Shooter
 				for (float x = position.X; x <= previousPos.X; x++)
 				{
 					float y = m * (x - position.X) + position.Y;
-					if (IsSameColor(currentMap.GetImageColor(new Vector2(x,y)), Material.Empty.Color, 0))
+					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(x,y)), Material.Empty.Color, 0))
 					{
 						Console.WriteLine(x + " " + y);
 
@@ -213,7 +225,7 @@ namespace Cave_Shooter
 			{
 				for (int y = (int)position.Y - 1; y <= (int)position.Y + 1; y++)
 				{
-					bool isFilled = IsSameColor(currentMap.GetImageColor(new Vector2(x, y)), Material.Terrain.Color, 0);
+					bool isFilled = Map.IsSameColor(currentMap.GetImageColor(new Vector2(x, y)), Material.Terrain.Color, 0);
 
 					if (isFilled)
 					{
@@ -255,7 +267,7 @@ namespace Cave_Shooter
 			Vector2 pos = start + line / 2;
 			testGame.debugView.UpdateDebug(pos);
 			Console.WriteLine(bestAir +""+ resolution);
-			if (IsSameColor(currentMap.GetImageColor(pos), Material.Terrain.Color, 0))
+			if (Map.IsSameColor(currentMap.GetImageColor(pos), Material.Terrain.Color, 0))
 			{
 				//hit
 				Console.WriteLine("hit");
@@ -290,18 +302,12 @@ namespace Cave_Shooter
 
 		private bool IsSameColorAtMapPosition(Color color, Vector2 position)
 		{
-			if (IsSameColor(currentMap.GetImageColor(position), color, 0))
+			if (Map.IsSameColor(currentMap.GetImageColor(position), color, 0))
 			{
 				return true;
 			}
 			return false;
 		}
 
-		private bool IsSameColor(Color a, Color b, float threshold)
-		{
-			return (MathF.Abs(a.R - b.R) <= threshold)
-					&& (MathF.Abs(a.G - b.G) <= threshold)
-					&& (MathF.Abs(a.B - b.B) <= threshold);
-		}
 	}
 }

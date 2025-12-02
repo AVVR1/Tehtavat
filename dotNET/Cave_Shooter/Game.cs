@@ -10,6 +10,8 @@ namespace Cave_Shooter
 {
 	internal class Game
 	{
+		private Map map;
+		private List<Player> players;
 		private Keybinds[] playerKeybinds =
 		[
 			new Keybinds(KeyboardKey.W, KeyboardKey.S, KeyboardKey.E, KeyboardKey.A, KeyboardKey.D),
@@ -17,19 +19,17 @@ namespace Cave_Shooter
 			new Keybinds(GamepadButton.RightFaceDown, GamepadButton.RightFaceDown, GamepadButton.RightFaceDown, GamepadButton.RightFaceDown,GamepadButton.RightFaceDown),
 			new Keybinds(GamepadButton.RightFaceDown, GamepadButton.RightFaceDown, GamepadButton.RightFaceDown, GamepadButton.RightFaceDown, GamepadButton.RightFaceDown)
 		];
-
 		private int playerCount;
-		private List<Player> players;
+		private BulletManager bulletManager;
 
 		public DebugView debugView;
 		
-		private Map map;
-
         public Game()
 		{
 			players = new List<Player>();
 			debugView = new DebugView();
 			map = new Map("Images/Map.png");
+			bulletManager = new BulletManager(map);
 		}
 
 		public void Init(int playerCount)
@@ -44,6 +44,7 @@ namespace Cave_Shooter
 				players[i].CalculateSplitscreenSize(16/9, playerCount+1, i); // Calculate split screen sizes
 				players[i].InitCamera();
 				players[i].currentMap = map;
+				players[i].OnShoot += ShootBullet;
 
 				// add game for testing purposes
 				players[i].testGame = this;
@@ -72,6 +73,7 @@ namespace Cave_Shooter
 
 		internal void Update()
 		{
+			bulletManager.UpdateBullets();
 			foreach (Player player in players)
 			{
 				player.Update();
@@ -86,7 +88,14 @@ namespace Cave_Shooter
             }
 			DrawDebug();
 			Raylib.DrawRectangleRec(debugView.splitScreenRect, Color.Blue);
+			
 			DrawUI();
+		}
+
+		private void ShootBullet(Vector2 position, Vector2 direction)
+		{
+			bulletManager.NewBullet(position, direction);
+			Console.WriteLine("SHOOOOOT");
 		}
 
 		private void DrawScene(Player player)
@@ -97,6 +106,7 @@ namespace Cave_Shooter
 			// Draw map
 			map.Draw();
 			// Draw players
+			bulletManager.DrawBullets();
 			foreach (Player subject in players)
 			{
 				subject.DrawPlayer();

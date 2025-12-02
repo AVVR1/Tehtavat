@@ -51,5 +51,12 @@ namespace Cave_Shooter
 		{
 			Raylib.DrawTexture(texture, 0, 0, Color.White);
 		}
+
+		public static bool IsSameColor(Color a, Color b, float threshold)
+		{
+			return (MathF.Abs(a.R - b.R) <= threshold)
+					&& (MathF.Abs(a.G - b.G) <= threshold)
+					&& (MathF.Abs(a.B - b.B) <= threshold);
+		}
 	}
 }
