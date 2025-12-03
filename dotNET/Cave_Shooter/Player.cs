@@ -19,6 +19,7 @@ namespace Cave_Shooter
 		private const float MAX_HEALTH = 100f;
 		private const float ENGINE_POWER = 200f;
 		private const float TURN_POWER = 300f;
+		private const float FRICTION = 1f;
 
 		// Events
 		public event Action<Vector2, Vector2> OnShoot;
@@ -128,7 +129,7 @@ namespace Cave_Shooter
 			CalculatePhysics();
 			Input();
 			CheckCollision();
-			testline = velocity;
+			testline = velocity * Raylib.GetFrameTime();
 		}
 
 		private void CalculatePhysics()
@@ -188,6 +189,7 @@ namespace Cave_Shooter
 				//Change player direction, prevent going through
 			if (Map.IsSameColor(currentMap.GetImageColor(position), Material.Terrain.Color, 0))
 			{
+				Vector2 normal = CalculateNormal((int)position.X, (int)position.Y, 10);
 				Vector2 bestPos = CollisionOffset(position, previousPos, previousPos, 0, 4);
 				Vector2 previousNormal = Vector2.Zero;
 				// Get First position outside of terrain
@@ -200,58 +202,57 @@ namespace Cave_Shooter
 					float y = m * (x - position.X) + position.Y;
 					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(x,y)), Material.Empty.Color, 0))
 					{
-						Console.WriteLine(x + " " + y);
-
 						break;
 					}
 				}
 				#endregion
-				Vector2 normal = CalculateTerrainNormal(bestPos);
 				if (normal != Vector2.Zero)
 				{
 					previousNormal = normal;
 				}
 				Collision(previousNormal);
-				position = bestPos;
+				position = bestPos + velocity * Raylib.GetFrameTime();
 			}
 		}
 
-		private Vector2 CalculateTerrainNormal(Vector2 position)
+		private Vector2 CalculateNormal(int x, int y, int radius)
 		{
-			int dx = 0;
-			int dy = 0;
+			float gx = 0;
+			float gy = 0;
 
-			for (int x = (int)position.X - 1; x <= (int)position.X + 1; x++)
+			for (int ox = -radius; ox <= radius; ox++)
 			{
-				for (int y = (int)position.Y - 1; y <= (int)position.Y + 1; y++)
+				for (int oy = -radius; oy <= radius; oy++)
 				{
-					bool isFilled = Map.IsSameColor(currentMap.GetImageColor(new Vector2(x, y)), Material.Terrain.Color, 0);
+					int sx = Math.Clamp(x + ox, 0, currentMap.texture.Width - 1);
+					int sy = Math.Clamp(y + oy, 0, currentMap.texture.Height - 1);
 
-					if (isFilled)
+					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(sx, sy)), Material.Empty.Color, 0)) // empty space influences direction
 					{
-						dx += x - (int)position.X;
-						dy += y - (int)position.Y;
+						gx += ox;
+						gy += oy;
 					}
 				}
 			}
 
-			Vector2 normal = new Vector2(-dx, -dy);
+			Vector2 normal = new Vector2(gx, gy);
+			if (normal.LengthSquared() == 0)
+				return Vector2.Zero;
 
-			if (normal == Vector2.Zero)
-			{
-				return normal;
-			}
-			normal = Vector2.Normalize(normal);
-
-			return normal;
+			return Vector2.Normalize(normal);
 		}
+
 		public void Collision(Vector2 normal)
 		{
 			float dot = Vector2.Dot(velocity, normal);
 			if (dot < 0)
 			{
-				Console.WriteLine("Change velocity direction" + Raylib.GetFrameTime());
-				velocity -= normal * dot;
+				//velocity -= normal * dot;
+				Vector2 perpendicular = normal * dot;
+				Vector2 tangential = velocity - perpendicular;
+				float angleFactor = -dot / velocity.Length();
+				velocity = tangential * (1-FRICTION * angleFactor);
+				Console.WriteLine((FRICTION * angleFactor));
 			}
 		}
 
@@ -260,24 +261,21 @@ namespace Cave_Shooter
 			resolution++;
 			if (resolution >= maxResolution)
 			{
+				testGame.debugView.UpdateDebug(bestAir);
 				return bestAir;
 			}
 
 			Vector2 line = start - end;
 			Vector2 pos = start + line / 2;
-			testGame.debugView.UpdateDebug(pos);
-			Console.WriteLine(bestAir +""+ resolution);
 			if (Map.IsSameColor(currentMap.GetImageColor(pos), Material.Terrain.Color, 0))
 			{
 				//hit
-				Console.WriteLine("hit");
 				//forget about previous half
 				return CollisionOffset(start, pos, bestAir, resolution, maxResolution);
 			}
 			else
 			{
 				//not hit
-				Console.WriteLine("Not hit!");
 				//forget about previous half
 				bestAir = CollisionOffset(pos, end, pos, resolution, maxResolution);
 			}
