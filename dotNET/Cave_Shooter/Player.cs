@@ -14,19 +14,21 @@ namespace Cave_Shooter
 	internal class Player : Damageable, IHealth
 	{
 		// Constants
+		public const float COLLIDER_RADIUS = 25f;
 		private const float GRAVITY = -9.81f;
 		private const float GRAVITY_MULT = 5f;
 		private const float MAX_HEALTH = 100f;
 		private const float ENGINE_POWER = 200f;
 		private const float TURN_POWER = 300f;
-		private const float FRICTION = 1f;
+		private const float FRICTION = 0.5f;
 
 		// Events
 		public event Action<Vector2, Vector2> OnShoot;
 		public event Action<Vector2, Vector2> OnShootSpecial;
 		public event Action OnThrust;
+		public event Action OnPlayerHurt;
+		public event Action OnPlayerDeath;
 
-		public static Texture2D texture;
 
 		// Camera
 		public Camera2D camera;
@@ -38,21 +40,26 @@ namespace Cave_Shooter
 		private Vector2 position = new Vector2(200, 200);
 		private float rotation = 0f;
 
+		// Miscellaneous
 		public Map currentMap { private get; set; }
 		private IInput inputDevice;
+		public static Texture2D texture;
 		private Weapon weapon;
 
 		// Physics variables
 		private float engineThrust = 0f;
 		private float maxSpeed = 300f;
-		private Vector2 acceleration;
 		/// <summary>
 		/// direction of where the player sprite is facing
 		/// </summary>
 		private Vector2 direction;
+		private Vector2 acceleration;
 		private Vector2 velocity;
-
-		public Game testGame;
+		/// <summary>
+		/// last valid normal that got calculated on terrain collision.
+		/// Only updates if a valid normal is found.
+		/// </summary>
+		private Vector2 lastValidNormal;
 
 		public Player(Weapon weapon, IInput inputDevice) // Initialize player
 		{
@@ -75,23 +82,7 @@ namespace Cave_Shooter
 			camera.Rotation = 0;
 		}
 
-		public void CalculateSplitscreenSize(float preferredRatio, int playerCount, int playerIndex)
-		{
-			int w = Raylib.GetScreenWidth();
-			int h = Raylib.GetScreenHeight();
-			float targetAspect = w / h / preferredRatio;
-			int rows = (int)MathF.Round(MathF.Sqrt(playerCount / targetAspect));
-			int columns = (int)MathF.Ceiling((float)playerCount / rows);
-			int splitScreenWidth = w / columns;
-			int splitScreenHeight = h / rows;
-			int splitScreenX = playerIndex % columns * splitScreenWidth;
-			int splitScreenY = (int)(MathF.Ceiling(playerIndex / columns) * splitScreenHeight);
-
-			// Set variables
-			screenCameraTexture = Raylib.LoadRenderTexture(splitScreenWidth, splitScreenHeight);
-			splitScreenRect = new Rectangle(splitScreenX, splitScreenY, splitScreenWidth, -splitScreenHeight);
-		}
-
+		#region input events
 		private void Shoot()
 		{
 			Console.WriteLine("Shoot");
@@ -115,21 +106,21 @@ namespace Cave_Shooter
 
 		public void OnDeath()
 		{
-			Console.WriteLine("Player should Die");
+			OnPlayerDeath?.Invoke();
 		}
 
 		public void OnHurt()
 		{
-			Console.WriteLine("Player got hurt");
+			OnPlayerHurt?.Invoke();
 		}
+		#endregion
 
 		public void Update()
 		{
 			camera.Target = position;
 			CalculatePhysics();
 			Input();
-			CheckCollision();
-			testline = velocity * Raylib.GetFrameTime();
+			CheckTerrainCollision();
 		}
 
 		private void CalculatePhysics()
@@ -181,110 +172,136 @@ namespace Cave_Shooter
 				Turn(-1);
 			}
 		}
-		Vector2 testline;
-		public void CheckCollision() // Check for collision each frame
+
+		// TODO: make collision have a radius
+		private void CheckTerrainCollision() // Terrain collision check. Is ran every frame
 		{
-			// if player collides with terrain
-				//Get terrain normal
-				//Change player direction, prevent going through
+			// Check for a collision
 			if (Map.IsSameColor(currentMap.GetImageColor(position), Material.Terrain.Color, 0))
 			{
-				Vector2 normal = CalculateNormal((int)position.X, (int)position.Y, 10);
-				Vector2 bestPos = CollisionOffset(position, previousPos, previousPos, 0, 4);
-				Vector2 previousNormal = Vector2.Zero;
-				// Get First position outside of terrain
-				#region
-				float dx = previousPos.X - position.X;
-				float dy = previousPos.Y - position.Y;
-				float m = dy / dx;
-				for (float x = position.X; x <= previousPos.X; x++)
-				{
-					float y = m * (x - position.X) + position.Y;
-					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(x,y)), Material.Empty.Color, 0))
-					{
-						break;
-					}
-				}
-				#endregion
+				// Get normal
+				Vector2 normal = GetTerrainNormalAtPosition((int)position.X, (int)position.Y, 10);
+				// Replace lastValidNormal only if a valid normal is found
 				if (normal != Vector2.Zero)
 				{
-					previousNormal = normal;
+					lastValidNormal = normal;
 				}
-				Collision(previousNormal);
+				// Use the last valid normal for sliding
+				Slide(lastValidNormal);
+				// Get best air position outside of terrain
+				Vector2 bestPos = GetBestAir(position, previousPos, previousPos, 0, 4);
+				// Update position and velocity for collision
 				position = bestPos + velocity * Raylib.GetFrameTime();
 			}
 		}
 
-		private Vector2 CalculateNormal(int x, int y, int radius)
+		/// <summary>
+		/// Returns a Vector2 normal from the terrain at the given position. If no valid normal is found, Returns Vector2.Zero
+		/// </summary>
+		/// <param name="x">position X</param>
+		/// <param name="y">position Y</param>
+		/// <param name="radius">search radius</param>
+		/// <returns>Vector2 normal</returns>
+		private Vector2 GetTerrainNormalAtPosition(int x, int y, int radius)
 		{
-			float gx = 0;
-			float gy = 0;
+			float xNormal = 0;
+			float yNormal = 0;
 
-			for (int ox = -radius; ox <= radius; ox++)
+			for (int xOffset = -radius; xOffset <= radius; xOffset++)
 			{
-				for (int oy = -radius; oy <= radius; oy++)
+				for (int yOffset = -radius; yOffset <= radius; yOffset++)
 				{
-					int sx = Math.Clamp(x + ox, 0, currentMap.texture.Width - 1);
-					int sy = Math.Clamp(y + oy, 0, currentMap.texture.Height - 1);
+					// Clam offsets to make sure they are not out-of-bounds
+					int xClamped = Math.Clamp(x + xOffset, 0, currentMap.texture.Width - 1);
+					int yClamped = Math.Clamp(y + yOffset, 0, currentMap.texture.Height - 1);
 
-					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(sx, sy)), Material.Empty.Color, 0)) // empty space influences direction
+					if (Map.IsSameColor(currentMap.GetImageColor(new Vector2(xClamped, yClamped)), Material.Empty.Color, 0)) // empty space influences direction
 					{
-						gx += ox;
-						gy += oy;
+						xNormal += xOffset;
+						yNormal += yOffset;
 					}
 				}
 			}
 
-			Vector2 normal = new Vector2(gx, gy);
+			Vector2 normal = new Vector2(xNormal, yNormal);
 			if (normal.LengthSquared() == 0)
 				return Vector2.Zero;
 
 			return Vector2.Normalize(normal);
 		}
 
-		public void Collision(Vector2 normal)
+		/// <summary>
+		/// Calculates the angle of impact between velocity and the given normal and changes direction of velocity to go along the wall (sliding), with perpendicular velocity removed.
+		/// Also simulates friction to slow down when sliding along terrain.
+		/// </summary>
+		/// <param name="normal">collision normal</param>
+		public void Slide(Vector2 normal)
 		{
 			float dot = Vector2.Dot(velocity, normal);
 			if (dot < 0)
 			{
-				//velocity -= normal * dot;
 				Vector2 perpendicular = normal * dot;
 				Vector2 tangential = velocity - perpendicular;
+				// How much the velocity is pointing into the surface normal. (used to scale friction)
 				float angleFactor = -dot / velocity.Length();
+
+				// Change direction of velocity and apply friction based on the angleFactor
 				velocity = tangential * (1-FRICTION * angleFactor);
-				Console.WriteLine((FRICTION * angleFactor));
 			}
 		}
 
-		private Vector2 CollisionOffset(Vector2 start, Vector2 end, Vector2 bestAir, int resolution, int maxResolution)
+		/// <summary>
+		/// Recursive function that does a binary search to find the closest non-terrain position to the collision.
+		/// </summary>
+		/// <param name="start">Start position of the vector</param>
+		/// <param name="end">End position of the vector</param>
+		/// <param name="bestAir">Best air</param>
+		/// <param name="currentRecursion">Recursion count</param>
+		/// <param name="maxRecursions">How many iterations the recursion will do</param>
+		/// <returns></returns>
+		private Vector2 GetBestAir(Vector2 start, Vector2 end, Vector2 bestAir, int currentRecursion, int maxRecursions)
 		{
-			resolution++;
-			if (resolution >= maxResolution)
+			currentRecursion++;
+			if (currentRecursion >= maxRecursions)
 			{
-				testGame.debugView.UpdateDebug(bestAir);
 				return bestAir;
 			}
 
 			Vector2 line = start - end;
 			Vector2 pos = start + line / 2;
+
 			if (Map.IsSameColor(currentMap.GetImageColor(pos), Material.Terrain.Color, 0))
 			{
 				//hit
 				//forget about previous half
-				return CollisionOffset(start, pos, bestAir, resolution, maxResolution);
+				return GetBestAir(start, pos, bestAir, currentRecursion, maxRecursions);
 			}
 			else
 			{
 				//not hit
 				//forget about previous half
-				bestAir = CollisionOffset(pos, end, pos, resolution, maxResolution);
+				bestAir = pos;
+				return GetBestAir(pos, end, bestAir, currentRecursion, maxRecursions);
 			}
-			return bestAir;
+		}
+
+		public void CheckBulletCollision(PoolingList<Bullet> bulletPool)
+		{
+			foreach (Bullet bullet in bulletPool.GetActiveList())
+			{
+				if (Raylib.CheckCollisionCircles(position, COLLIDER_RADIUS, bullet.position, bullet.radius))
+				{
+					// Bullet player collision
+					TakeDamage(bullet.damage);
+					velocity += bullet.velocity * 5f;
+					bulletPool.SetActivity(bulletPool.GetIndex(bullet), false);
+				}
+			}
 		}
 
 		public void DrawPlayer()
 		{
-			Raylib.DrawCircleV(previousPos, 10, Color.Blue);
+			Raylib.DrawCircleV(position, COLLIDER_RADIUS, Color.Red);
 			Raylib.DrawTexturePro
 			(
 				texture,
@@ -294,18 +311,29 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
-			Raylib.DrawLineV(position, position + testline * 10, Color.Red);
-
 		}
 
-		private bool IsSameColorAtMapPosition(Color color, Vector2 position)
+		/// <summary>
+		/// Calculate the position and scale of the splitscreen. fits splitscreens to the screen based on the preferred ratio, and number of splitscreens.
+		/// </summary>
+		/// <param name="preferredRatio"></param>
+		/// <param name="splitscreenCount"></param>
+		/// <param name="screenIndex"></param>
+		public void CalculateSplitscreenSize(float preferredRatio, int splitscreenCount, int screenIndex)
 		{
-			if (Map.IsSameColor(currentMap.GetImageColor(position), color, 0))
-			{
-				return true;
-			}
-			return false;
-		}
+			int w = Raylib.GetScreenWidth();
+			int h = Raylib.GetScreenHeight();
+			float targetAspect = w / h / preferredRatio;
+			int rows = (int)MathF.Round(MathF.Sqrt(splitscreenCount / targetAspect));
+			int columns = (int)MathF.Ceiling((float)splitscreenCount / rows);
+			int splitScreenWidth = w / columns;
+			int splitScreenHeight = h / rows;
+			int splitScreenX = screenIndex % columns * splitScreenWidth;
+			int splitScreenY = (int)(MathF.Ceiling(screenIndex / columns) * splitScreenHeight);
 
+			// Set variables
+			screenCameraTexture = Raylib.LoadRenderTexture(splitScreenWidth, splitScreenHeight);
+			splitScreenRect = new Rectangle(splitScreenX, splitScreenY, splitScreenWidth, -splitScreenHeight);
+		}
 	}
 }

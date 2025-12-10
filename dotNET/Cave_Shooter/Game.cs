@@ -41,27 +41,22 @@ namespace Cave_Shooter
 			{
 				//TODO: add selected weapon
 				players.Add(new Player(new Weapon(), new Keyboard(playerKeybinds[i])));
-				players[i].CalculateSplitscreenSize(16/9, playerCount+1, i); // Calculate split screen sizes
-				players[i].InitCamera();
-				players[i].currentMap = map;
-				players[i].OnShoot += ShootBullet;
-
-				// add game for testing purposes
-				players[i].testGame = this;
+				Player player = players[i];
+				player.CalculateSplitscreenSize(16/9, playerCount+1, i); // Calculate split screen sizes
+				player.InitCamera();
+				player.currentMap = map;
+				player.OnShoot += ShootBullet;
+				player.OnPlayerDeath += () => RemovePlayer(player);
 			}
 			// init debug camera
 			debugView.camera.Offset = new Vector2(debugView.screenCameraTexture.Texture.Width / 2, debugView.screenCameraTexture.Texture.Height / 2);
 			debugView.CalculateSplitscreenSize(16 / 9, playerCount+1, playerCount);
-
-			map.MapDrawRectangle(new Rectangle(-50,400,400,50), Material.Terrain.Color);
-			map.UpdateTexture();
 		}
 
         public void Start()
 		{
 			InitTextures();
 			//Create map
-
 		}
 
 		private void Stop()
@@ -74,16 +69,19 @@ namespace Cave_Shooter
 		internal void Update()
 		{
 			bulletManager.UpdateBullets();
-			foreach (Player player in players)
+			for (int i = players.Count - 1; i >= 0; i--)
 			{
+				Player player = players[i];
 				player.Update();
+				player.CheckBulletCollision(bulletManager.bulletPool);
 			}
 		}
 
 		internal void Draw()
 		{
-			foreach (Player player in players)
+			for (int i = players.Count - 1; i >= 0; i--)
 			{
+				Player player = players[i];
 				DrawScene(player);
             }
 			DrawDebug();
@@ -94,7 +92,7 @@ namespace Cave_Shooter
 
 		private void ShootBullet(Vector2 position, Vector2 direction)
 		{
-			bulletManager.NewBullet(position, direction);
+			bulletManager.NewBullet(position + direction * Bullet.RADIUS + direction * Player.COLLIDER_RADIUS, direction);
 			Console.WriteLine("SHOOOOOT");
 		}
 
@@ -138,6 +136,11 @@ namespace Cave_Shooter
 		private void InitTextures()
 		{
 			Player.InitTexture();
+		}
+
+		private void RemovePlayer(Player player)
+		{
+			players.Remove(player);
 		}
 	}
 }

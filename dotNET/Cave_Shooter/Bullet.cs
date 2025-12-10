@@ -10,16 +10,20 @@ namespace Cave_Shooter
 {
 	internal class Bullet
 	{
+		public static float RADIUS = 10f;
+		public static float SPEED = 10f;
+
 		public Vector2 position;
 		public Vector2 velocity;
-		private float radius;
+		public float radius;
+		public float damage;
 		public int explosionRadius = 10;
 
 		public Bullet(Vector2 position, Vector2 velocity)
 		{
 			this.position = position;
 			this.velocity = velocity;
-			radius = 10;
+			damage = 10f;
 		}
 
 		public void Update()
@@ -29,7 +33,7 @@ namespace Cave_Shooter
 
 		public void Draw()
 		{
-			Raylib.DrawCircleV(position, radius, Color.White);
+			Raylib.DrawCircleV(position, RADIUS, Color.White);
 		}
 	}
 }

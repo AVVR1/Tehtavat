@@ -22,14 +22,14 @@ namespace Cave_Shooter
 			Bullet? bullet;
 			if (bulletPool.activeIndex <= 0)
 			{
-				bullet = new Bullet(position, direction * 10);
+				bullet = new Bullet(position, direction * Bullet.SPEED);
 				bulletPool.AddObject(bullet);
 			}
 			else
 			{
 				bullet = bulletPool.SetActivity(0, true);
 				bullet.position = position;
-				bullet.velocity = direction;
+				bullet.velocity = direction * Bullet.SPEED;
 			}
 		}
 
@@ -37,11 +37,10 @@ namespace Cave_Shooter
 		{
 			foreach (Bullet bullet in bulletPool.GetActiveList())
 			{
-				Console.WriteLine(bulletPool.GetIndex(bullet));
 				bullet.Update();
 				if (Map.IsSameColor(currentMap.GetImageColor(bullet.position), Material.Terrain.Color, 0))
 				{
-					// Bullet collision
+					// Bullet terrain collision
 					bulletPool.SetActivity(bulletPool.GetIndex(bullet), false);
 					currentMap.MapDrawCircle(bullet.position, bullet.explosionRadius, Material.Empty.Color);
 					currentMap.UpdateTexture();

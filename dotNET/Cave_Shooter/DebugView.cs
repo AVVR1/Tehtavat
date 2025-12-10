@@ -17,9 +17,10 @@ namespace Cave_Shooter
 		public DebugView()
 		{
 			camera = new Camera2D();
+			camera.Offset = new Vector2(1000,10);
 			camera.Target = Vector2.Zero;
-			camera.Zoom = 80;
-			camera.Offset = -new Vector2(Raylib.GetScreenWidth()/2, Raylib.GetScreenHeight()/2);
+			camera.Zoom = 1;
+			//camera.Offset = -new Vector2(Raylib.GetScreenWidth()/2, Raylib.GetScreenHeight()/2);
 		}
 
 		public void CalculateSplitscreenSize(float preferredRatio, int playerCount, int playerIndex)
@@ -49,7 +50,7 @@ namespace Cave_Shooter
 			DrawX(splitScreenRect.Position + new Vector2(1,-1) * splitScreenRect.Size/2, Vector2.One*5);
 		}
 
-		private void DrawX(Vector2 position, Vector2 size)
+		public void DrawX(Vector2 position, Vector2 size)
 		{
 			Raylib.DrawLineEx(position-size, position + size, 2f, Color.Red);
 			Raylib.DrawLineEx(position + new Vector2(-1, 1) * size, position - new Vector2(-1, 1) * size, 2f, Color.Red);

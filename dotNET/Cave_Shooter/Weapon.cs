@@ -15,6 +15,6 @@ namespace Cave_Shooter
 		private float recoil;
 		private float knockback;
 		private Sound sound;
-		private Bullet? bullet;
+		public Type bullet;
 	}
 }
