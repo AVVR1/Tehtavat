@@ -7,7 +7,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using ZeroElectric.Vinculum.Extensions;
 
 namespace Cave_Shooter
 {
@@ -173,14 +172,14 @@ namespace Cave_Shooter
 			}
 		}
 
-		// TODO: make collision have a radius
 		private void CheckTerrainCollision() // Terrain collision check. Is ran every frame
 		{
 			// Check for a collision
-			if (Map.IsSameColor(currentMap.GetImageColor(position), Material.Terrain.Color, 0))
+			Vector2? edgePos = IsColliderInTerrain(position);
+			if (edgePos != null)
 			{
 				// Get normal
-				Vector2 normal = GetTerrainNormalAtPosition((int)position.X, (int)position.Y, 10);
+				Vector2 normal = GetTerrainNormalAtPosition((int)edgePos.Value.X, (int)edgePos.Value.Y, 10);
 				// Replace lastValidNormal only if a valid normal is found
 				if (normal != Vector2.Zero)
 				{
@@ -270,7 +269,8 @@ namespace Cave_Shooter
 			Vector2 line = start - end;
 			Vector2 pos = start + line / 2;
 
-			if (Map.IsSameColor(currentMap.GetImageColor(pos), Material.Terrain.Color, 0))
+			Vector2? edgePos = IsColliderInTerrain(pos);
+			if (edgePos != null)
 			{
 				//hit
 				//forget about previous half
@@ -311,6 +311,21 @@ namespace Cave_Shooter
 				rotation,
 				Color.White
 			);
+		}
+
+		private Vector2? IsColliderInTerrain(Vector2 position)
+		{
+			float angleSpacing = 5;
+			for (float angle = 0; angle < 360; angle += angleSpacing)
+			{
+				Vector2 edgePos = position + new Vector2(MathF.Cos(angle * Raylib.DEG2RAD), MathF.Sin(angle * Raylib.DEG2RAD)) * COLLIDER_RADIUS;
+
+				if (Map.IsSameColor(currentMap.GetImageColor(edgePos), Material.Terrain.Color, 0))
+				{
+					return edgePos;
+				}
+			}
+			return null;
 		}
 
 		/// <summary>
