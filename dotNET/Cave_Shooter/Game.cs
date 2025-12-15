@@ -83,6 +83,7 @@ namespace Cave_Shooter
 			{
 				Player player = players[i];
 				DrawScene(player);
+				DrawPlayerUI(player);
             }
 			DrawDebug();
 			Raylib.DrawRectangleRec(debugView.splitScreenRect, Color.Blue);
@@ -126,6 +127,13 @@ namespace Cave_Shooter
 
 			Raylib.DrawTextureRec(debugView.screenCameraTexture.Texture, new Rectangle(Vector2.Zero, debugView.splitScreenRect.Size), debugView.splitScreenRect.Position, Color.White);
 			debugView.DrawDebugUI();
+		}
+
+		private void DrawPlayerUI(Player player)
+		{
+			Vector2 origin = player.splitScreenRect.Position;
+			Raylib.DrawRectangle((int)origin.X + 50, (int)origin.Y + 200, 200, 20, Color.DarkGray);
+			Raylib.DrawRectangle((int)origin.X + 52, (int)origin.Y + 202, (int)(1.96f * player.health) , 20, Color.Green);
 		}
 
 		private void DrawUI()
