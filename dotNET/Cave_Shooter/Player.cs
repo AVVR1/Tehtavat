@@ -84,7 +84,7 @@ namespace Cave_Shooter
 		#region input events
 		private void Shoot()
 		{
-			Console.WriteLine("Shoot");
+			velocity -= direction * weapon.recoil;
 		}
 
 		private void ShootSpecial()

@@ -12,7 +12,7 @@ namespace Cave_Shooter
 		private string? name;
 		private int bulletCount;
 		private float reloadTime;
-		private float recoil;
+		public float recoil = 50f;
 		private float knockback;
 		private Sound sound;
 		public Type bullet;
