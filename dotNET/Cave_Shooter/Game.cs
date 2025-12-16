@@ -42,15 +42,15 @@ namespace Cave_Shooter
 				//TODO: add selected weapon
 				players.Add(new Player(new Weapon(), new Keyboard(playerKeybinds[i])));
 				Player player = players[i];
-				player.CalculateSplitscreenSize(16/9, playerCount+1, i); // Calculate split screen sizes
+				player.CalculateSplitscreenSize(16/9, playerCount, i); // Calculate split screen sizes
 				player.InitCamera();
 				player.currentMap = map;
 				player.OnShoot += ShootBullet;
 				player.OnPlayerDeath += () => RemovePlayer(player);
 			}
 			// init debug camera
-			debugView.camera.Offset = new Vector2(debugView.screenCameraTexture.Texture.Width / 2, debugView.screenCameraTexture.Texture.Height / 2);
-			debugView.CalculateSplitscreenSize(16 / 9, playerCount+1, playerCount);
+			//debugView.camera.Offset = new Vector2(debugView.screenCameraTexture.Texture.Width / 2, debugView.screenCameraTexture.Texture.Height / 2);
+			//debugView.CalculateSplitscreenSize(16 / 9, playerCount+1, playerCount);
 		}
 
         public void Start()
@@ -85,8 +85,8 @@ namespace Cave_Shooter
 				DrawScene(player);
 				DrawPlayerUI(player);
             }
-			DrawDebug();
-			Raylib.DrawRectangleRec(debugView.splitScreenRect, Color.Blue);
+			//DrawDebug();
+			//Raylib.DrawRectangleRec(debugView.splitScreenRect, Color.Blue);
 			
 			DrawUI();
 		}
@@ -132,8 +132,22 @@ namespace Cave_Shooter
 		private void DrawPlayerUI(Player player)
 		{
 			Vector2 origin = player.splitScreenRect.Position;
-			Raylib.DrawRectangle((int)origin.X + 50, (int)origin.Y + 200, 200, 20, Color.DarkGray);
-			Raylib.DrawRectangle((int)origin.X + 52, (int)origin.Y + 202, (int)(1.96f * player.health) , 20, Color.Green);
+			Vector2 healthBarPosition = new Vector2(20, - player.splitScreenRect.Size.Y - 40);
+			Vector2 healthBarScale = new Vector2(200, 20);
+			Raylib.DrawRectangle
+			(
+				(int)(origin.X + healthBarPosition.X),
+				(int)(origin.Y + healthBarPosition.Y), 
+				(int)healthBarScale.X, (int)healthBarScale.Y, Color.DarkGray
+			);
+			Raylib.DrawRectangle
+			(
+				(int)(origin.X + healthBarPosition.X) + 2,
+				(int)(origin.Y + healthBarPosition.Y) + 2,
+				(int)(1.96f * player.health),
+				(int)healthBarScale.Y - 4,
+				Raylib.ColorFromHSV(player.health / player.maxHealth * 120, 1, 1)
+			);
 		}
 
 		private void DrawUI()
