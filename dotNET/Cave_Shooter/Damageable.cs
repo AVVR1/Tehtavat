@@ -16,7 +16,7 @@ namespace Cave_Shooter
 
 		public void TakeDamage(float amount)
 		{
-			if (health > 0)
+			if (health - amount > 0)
 			{
 				health -= amount;
 				(this as IHealth)?.OnHurt();
